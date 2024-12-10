@@ -9,6 +9,7 @@ namespace E_Lab_Backend.Models
         public string PasswordHashed {  get; set; }
         public DateOnly BirthDate { get; set; }
         public ICollection<TestResultPatient> PatientTestResults { get; set; } = [];
+        public string Role { get; set; } = "User";
         public RefreshToken? RefreshToken { get; set; }
 
         public int GetAgeInMonths()

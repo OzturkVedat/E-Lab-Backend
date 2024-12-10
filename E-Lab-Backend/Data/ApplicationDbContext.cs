@@ -30,6 +30,11 @@ namespace E_Lab_Backend.Data
                 .WithOne(r => r.User)
                 .HasForeignKey<RefreshToken>(r => r.UserId)
                 .OnDelete(DeleteBehavior.Cascade);  // delete the tokens when the user is deleted
+
+            builder.Entity<UserModel>()     // indexing the email column
+                .HasIndex(u => u.Email)
+                .IsUnique();
+
         }
     }
 }

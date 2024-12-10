@@ -6,7 +6,11 @@ namespace E_Lab_Backend.Interface
     public interface IUserRepository
     {
         Task<ResultModel> GetUserById(string id);
+        Task<ResultModel> GetUserDetails(string id);
+        Task<ResultModel> GetAllPatientDetails();
         Task<ResultModel> GetUserByEmail(string email);
+        Task<bool> UserExists(string userId);
         Task<ResultModel> AddUser(UserModel user);
+        Task<ResultModel> DeleteUser(string id);
     }
 }

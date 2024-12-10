@@ -37,12 +37,13 @@ namespace E_Lab_Backend.Controllers
                     .Select(e => e.ErrorMessage));
                 return BadRequest(new FailureResult(errorMessages));
             }
-
             var userResult = await _userRepository.GetUserByEmail(dto.Email);
             if (userResult.IsSucess)
+            {
                 return BadRequest(new FailureResult("Kullanıcı zaten mevcut."));
+            }
+            var hashedPassword = _passwordHasher.HashPassword(dto.Password);
 
-            var hashedPassword= _passwordHasher.HashPassword(dto.Password);
             var user = new UserModel
             {
                 Email = dto.Email,
@@ -50,32 +51,37 @@ namespace E_Lab_Backend.Controllers
                 BirthDate = dto.BirthDate,
                 PasswordHashed = hashedPassword
             };
-
-            var result= await _userRepository.AddUser(user);
-            return result.IsSucess?
-                Ok(new SuccessResult("Kullanıcı başarıyla kaydedildi.")): BadRequest(result);
+            var result = await _userRepository.AddUser(user);
+            return result.IsSucess
+                ? Ok(new SuccessResult("Kullanıcı başarıyla kaydedildi."))
+                : BadRequest(result);
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> LoginUser([FromBody] LoginDto dto)
         {
+
             if (!ModelState.IsValid)
             {
                 var errorMessages = string.Join(", ", ModelState.Values
                     .SelectMany(v => v.Errors)
                     .Select(e => e.ErrorMessage));
+                _logger.LogWarning("Login failed for {Email} due to invalid model state: {Errors}", dto.Email, errorMessages);
                 return BadRequest(new FailureResult(errorMessages));
             }
+
             var userCheck = await _userRepository.GetUserByEmail(dto.Email);
             if (userCheck is not SuccessDataResult<UserModel> user)
                 return Unauthorized(new FailureResult("Geçersiz kimlik bilgileri."));
 
-            var isPasswordValid = _passwordHasher.VerifyPassword(dto.Password,user.Data.PasswordHashed);
-            if (!isPasswordValid)
+            var isPasswordValid = _passwordHasher.VerifyPassword(dto.Password, user.Data.PasswordHashed);
+            if (!isPasswordValid)            
                 return Unauthorized(new FailureResult("Geçersiz kimlik bilgileri."));
+            
 
             var userId = user.Data.Id;
-            var accessToken = _jwtService.GenerateJwt(userId, "User");
+            var role= user.Data.Role;
+            var accessToken = _jwtService.GenerateJwt(userId, role);
             var refreshToken = await _jwtService.GenerateRefreshToken(userId);
 
             var response = new AuthResponse

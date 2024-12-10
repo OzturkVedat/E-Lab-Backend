@@ -17,9 +17,10 @@ namespace E_Lab_Backend.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     PasswordHashed = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BirthDate = table.Column<DateOnly>(type: "date", nullable: false)
+                    BirthDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -128,6 +129,12 @@ namespace E_Lab_Backend.Migrations
                 name: "IX_TestResultsPatient_PatientId",
                 table: "TestResultsPatient",
                 column: "PatientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_Email",
+                table: "Users",
+                column: "Email",
+                unique: true);
         }
 
         /// <inheritdoc />

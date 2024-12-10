@@ -33,4 +33,5 @@
             Message = "Istenen veriler basariyla alindi";
         }
     }
+
 }
