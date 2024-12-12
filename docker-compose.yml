@@ -1,0 +1,19 @@
+services:
+  e-lab-backend:
+    image: ${DOCKER_REGISTRY-}elabbackend
+    container_name: e-lab-api
+    build:
+      context: .
+      dockerfile: E-Lab-Backend/Dockerfile
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+
+  mssql-database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: e-lab-db
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Password!"
+    ports:
+      - "1433:1433"

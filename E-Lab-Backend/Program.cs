@@ -91,8 +91,17 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var dbSeeder = scope.ServiceProvider.GetRequiredService<DbSeeder>();
-    await dbSeeder.SeedDataContext(); 
+    try{
+        var db= scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        db.Database.Migrate();  // apply pending migrations
+
+        var dbSeeder = scope.ServiceProvider.GetRequiredService<DbSeeder>();
+        await dbSeeder.SeedDataContext(); 
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"An error occurred while initializing the database: {ex.Message}");
+    }
 }
 
 if (app.Environment.IsDevelopment())
