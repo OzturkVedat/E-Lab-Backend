@@ -8,9 +8,10 @@ namespace E_Lab_Backend.Models
         public string Email {  get; set; }
         public string PasswordHashed {  get; set; }
         public DateOnly BirthDate { get; set; }
-        public ICollection<TestResultPatient> PatientTestResults { get; set; } = [];
         public string Role { get; set; } = "User";
         public RefreshToken? RefreshToken { get; set; }
+
+        public GenderEnum Gender { get; set; }
 
         public int GetAgeInMonths()
         {
@@ -26,6 +27,12 @@ namespace E_Lab_Backend.Models
             }
             return ageInYears * 12 + ageInMonths;
         }
+    }
+
+    public enum GenderEnum
+    {
+        Male,
+        Female
     }
 
     public class RefreshToken

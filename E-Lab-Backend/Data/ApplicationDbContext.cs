@@ -11,19 +11,17 @@ namespace E_Lab_Backend.Data
         }
 
         public DbSet<UserModel> Users { get; set; }
-        public DbSet<TestResultPatient> TestResultsPatient { get; set; }
-        public DbSet<TestResultAdmin> TestResultsAdmin { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<IgManualOs> IgsManualOs {  get; set; }
+        public DbSet<IgManualTjp> IgsManualTjp { get; set; }
+        public DbSet<IgManualCilvPrimer> IgsManualCilvPrimer { get; set; }
+        public DbSet<IgManualCilvSeconder> IgsManualCilvSeconder { get; set; }
+        public DbSet<IgManualAp> IgsManualAp { get; set; }
+        public DbSet<IgManualTubitak> IgsManualTubitak { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
-            builder.Entity<TestResultPatient>()
-                .HasOne(t => t.Patient)
-                .WithMany(p => p.PatientTestResults)
-                .HasForeignKey(p => p.PatientId)
-                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<UserModel>()
                 .HasOne(u => u.RefreshToken)
