@@ -18,6 +18,7 @@
 docker ps
 ```
 
-### 4- Once the containers are up (can take a few minutes), API will be accessible at [Swagger](http://localhost:5000/swagger/index.html) or (https://localhost:5001/swagger/index.html)
+### 4- Once the containers are up (can take a few minutes), API will be accessible at
+(http://localhost:5000/swagger/index.html) or (https://localhost:5001/swagger/index.html)
 
 ### 5- You can use Docker desktop to manage the containers and check for logs.
