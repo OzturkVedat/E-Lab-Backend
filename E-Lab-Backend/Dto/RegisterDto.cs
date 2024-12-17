@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using E_Lab_Backend.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace E_Lab_Backend.Dto
 {
@@ -11,6 +12,9 @@ namespace E_Lab_Backend.Dto
         [Required(ErrorMessage = "Dogum tarihi alani zorunludur.")]
         [DateNotInFuture(ErrorMessage = "Dogum tarihi gelecekte olamaz.")]
         public DateOnly BirthDate { get; set; }
+
+        [Required(ErrorMessage = "Cinsiyet alani zorunludur.")]
+        public GenderEnum Gender { get; set; }
 
         [Required(ErrorMessage = "Email alani zorunludur.")]
         [EmailAddress(ErrorMessage = "Lutfen gecerli bir e-mail giriniz.")]

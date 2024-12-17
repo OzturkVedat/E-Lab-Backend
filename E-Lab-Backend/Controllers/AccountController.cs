@@ -40,7 +40,7 @@ namespace E_Lab_Backend.Controllers
             var userResult = await _userRepository.GetUserByEmail(dto.Email);
             if (userResult.IsSucess)
             {
-                return BadRequest(new FailureResult("Kullanıcı zaten mevcut."));
+                return BadRequest(new FailureResult("Kullanici zaten mevcut."));
             }
             var hashedPassword = _passwordHasher.HashPassword(dto.Password);
 
@@ -53,7 +53,7 @@ namespace E_Lab_Backend.Controllers
             };
             var result = await _userRepository.AddUser(user);
             return result.IsSucess
-                ? Ok(new SuccessResult("Kullanıcı başarıyla kaydedildi."))
+                ? Ok(new SuccessResult("Kullanici basariyla kaydedildi."))
                 : BadRequest(result);
         }
 

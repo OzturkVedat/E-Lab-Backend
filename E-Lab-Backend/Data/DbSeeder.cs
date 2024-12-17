@@ -1,5 +1,9 @@
-﻿using E_Lab_Backend.Models;
+﻿using AutoMapper;
+using E_Lab_Backend.Dto;
+using E_Lab_Backend.Interface;
+using E_Lab_Backend.Models;
 using E_Lab_Backend.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,11 +13,16 @@ namespace E_Lab_Backend.Data
     {
         private readonly ApplicationDbContext _context;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
         private readonly ILogger<DbSeeder> _logger;
-        public DbSeeder(ApplicationDbContext context, IPasswordHasher passwordHasher, ILogger<DbSeeder> logger)
+        public DbSeeder(ApplicationDbContext context, IPasswordHasher passwordHasher, IUserRepository userRepository,
+            IMapper mapper, ILogger<DbSeeder> logger)
         {
             _context = context;
             _passwordHasher = passwordHasher;
+            _userRepository = userRepository;
+            _mapper = mapper;
             _logger = logger;
         }
 
@@ -27,19 +36,22 @@ namespace E_Lab_Backend.Data
                     await SeedPatients();
                 }
 
+                if (!_context.TestResults.Any())
+                    await SeedTestResults();
+
                 if (!_context.IgsManualTjp.Any())
                     await SeedIgManualTjp();
-                
-                if (!_context.IgsManualOs.Any())               
+
+                if (!_context.IgsManualOs.Any())
                     await SeedIgManualOs();
-                
-                if (!_context.IgsManualCilvPrimer.Any())               
+
+                if (!_context.IgsManualCilvPrimer.Any())
                     await SeedIgManualCilvPrimer();
-                
-                if (!_context.IgsManualCilvSeconder.Any())               
+
+                if (!_context.IgsManualCilvSeconder.Any())
                     await SeedIgManualCilvSec();
-                
-                if (!_context.IgsManualCilvSeconder.Any())                
+
+                if (!_context.IgsManualCilvSeconder.Any())
                     await SeedIgManualCilvSec();
 
                 if (!_context.IgsManualAp.Any())
@@ -69,26 +81,63 @@ namespace E_Lab_Backend.Data
                 Email = "admin@example.com",
                 PasswordHashed = pwHashed,
                 BirthDate = DateOnly.FromDateTime(DateTime.UtcNow),
-                Role = "Admin"
+                Role = "Admin",
+                Gender = GenderEnum.Female
             };
             await _context.Users.AddAsync(admin);
             await _context.SaveChangesAsync();
         }
         private async Task SeedPatients()
         {
-            string password = "patient123";
-            string pwHashed = _passwordHasher.HashPassword(password);
-
-            var admin = new UserModel
+            var patients = new List<RegisterDto>
             {
-                FullName = "Seeded Patient",
-                Email = "patient@example.com",
-                PasswordHashed = pwHashed,
-                BirthDate = DateOnly.FromDateTime(DateTime.UtcNow),
-                Role = "User"
+                new RegisterDto { FullName = "M.A.", Email = "ma@email.com", Password = "mapassword123", BirthDate = new DateOnly(2022,02,21), Gender=GenderEnum.Male },
+                new RegisterDto { FullName = "M.E.C.", Email = "mec@email.com", Password = "mecpassword123", BirthDate = new DateOnly(2021,03,24), Gender=GenderEnum.Male },
+                new RegisterDto { FullName = "A.K.", Email = "ak@email.com", Password = "akpasswordak123", BirthDate = new DateOnly(2019,12,20), Gender=GenderEnum.Female },
+                new RegisterDto { FullName = "Y.K.", Email = "yk@email.com", Password = "ykpasswordak123", BirthDate = new DateOnly(2022,05,10), Gender=GenderEnum.Female }
             };
-            await _context.Users.AddAsync(admin);
-            await _context.SaveChangesAsync();
+
+            foreach (var patient in patients)
+            {
+                try
+                {
+                    var pwHashed = _passwordHasher.HashPassword(patient.Password);
+                    var newUser = _mapper.Map<UserModel>(patient);
+                    newUser.PasswordHashed = pwHashed;
+
+                    await _userRepository.AddUser(newUser);
+                }
+                catch (SqlException ex)
+                {
+                    _logger.LogError(ex, $"Error registering patient {patient.Email}");
+                }
+            }
+        }
+
+        private async Task SeedTestResults()
+        {
+            try
+            {
+                var userMa = await _userRepository.GetUserByEmail("ma@email.com") as SuccessDataResult<UserModel>;
+                var userMec = await _userRepository.GetUserByEmail("mec@email.com") as SuccessDataResult<UserModel>;
+                var userAk = await _userRepository.GetUserByEmail("ak@email.com") as SuccessDataResult<UserModel>;
+                var userYk = await _userRepository.GetUserByEmail("yk@email.com") as SuccessDataResult<UserModel>;
+
+                var testRes = new List<TestResult>
+                {
+                    new TestResult{PatientId=userMa.Data.Id, IgG=766 , IgA=49.4f , IgM=58, },
+                    new TestResult{PatientId=userMec.Data.Id, IgG=641 , IgA=43 , IgM=28, IgG1=418 , IgG2=254 , IgG3=18 , IgG4=9.4f },
+                    new TestResult{PatientId=userAk.Data.Id, IgG=866 , IgA=126 , IgM=74.8f, IgG1=546 , IgG2=199 , IgG3=13 , IgG4=6.9f },
+                    new TestResult{PatientId=userYk.Data.Id, IgG=636 , IgA=83 , IgM=44.6f, IgG1=420 , IgG2=227 , IgG3=24 , IgG4=9.2f },
+                };
+                await _context.TestResults.AddRangeAsync(testRes);
+                await _context.SaveChangesAsync();
+            }
+            catch (SqlException ex)
+            {
+                _logger.LogError(ex, $"Error registering test result.");
+            }
+
         }
 
         private async Task SeedIgManualTubitak()
@@ -181,7 +230,7 @@ namespace E_Lab_Backend.Data
                 new IgManualTubitak { AgeInMonthsLowerLimit = 193, AgeInMonthsUpperLimit = 216, GeometricMean = 38.89f, GMStandardDeviation = 23.08f, Mean = 50.16f, MeanStandardDeviation = 23.08f, MinValue = 7.86f, MaxValue = 157f, CILowerLimit = 36.32f, CIUpperLimit = 64.01f }
             };
 
-            using var transaction = await _context.Database.BeginTransactionAsync();        
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 await _context.IgsManualTubitak.AddRangeAsync(igAList);

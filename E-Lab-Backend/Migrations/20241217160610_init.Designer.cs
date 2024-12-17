@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace E_Lab_Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241215143020_init")]
+    [Migration("20241217160610_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -310,6 +310,58 @@ namespace E_Lab_Backend.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
+            modelBuilder.Entity("E_Lab_Backend.Models.TestResult", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("ExpertApproveTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<float?>("IgA")
+                        .HasColumnType("real");
+
+                    b.Property<float?>("IgG")
+                        .HasColumnType("real");
+
+                    b.Property<float?>("IgG1")
+                        .HasColumnType("real");
+
+                    b.Property<float?>("IgG2")
+                        .HasColumnType("real");
+
+                    b.Property<float?>("IgG3")
+                        .HasColumnType("real");
+
+                    b.Property<float?>("IgG4")
+                        .HasColumnType("real");
+
+                    b.Property<float?>("IgM")
+                        .HasColumnType("real");
+
+                    b.Property<string>("PatientId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("SampleAcceptTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("SampleCollectionTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SampleType")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TestRequestTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PatientId");
+
+                    b.ToTable("TestResults");
+                });
+
             modelBuilder.Entity("E_Lab_Backend.Models.UserModel", b =>
                 {
                     b.Property<string>("Id")
@@ -356,9 +408,22 @@ namespace E_Lab_Backend.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("E_Lab_Backend.Models.TestResult", b =>
+                {
+                    b.HasOne("E_Lab_Backend.Models.UserModel", "Patient")
+                        .WithMany("TestResults")
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Patient");
+                });
+
             modelBuilder.Entity("E_Lab_Backend.Models.UserModel", b =>
                 {
                     b.Navigation("RefreshToken");
+
+                    b.Navigation("TestResults");
                 });
 #pragma warning restore 612, 618
         }

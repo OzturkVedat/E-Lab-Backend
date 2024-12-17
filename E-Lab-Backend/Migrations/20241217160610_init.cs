@@ -149,11 +149,11 @@ namespace E_Lab_Backend.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Gender = table.Column<int>(type: "int", nullable: false),
+                    BirthDate = table.Column<DateOnly>(type: "date", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     PasswordHashed = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BirthDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Gender = table.Column<int>(type: "int", nullable: false)
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -181,11 +181,46 @@ namespace E_Lab_Backend.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "TestResults",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SampleType = table.Column<int>(type: "int", nullable: false),
+                    IgG = table.Column<float>(type: "real", nullable: true),
+                    IgA = table.Column<float>(type: "real", nullable: true),
+                    IgM = table.Column<float>(type: "real", nullable: true),
+                    IgG1 = table.Column<float>(type: "real", nullable: true),
+                    IgG2 = table.Column<float>(type: "real", nullable: true),
+                    IgG3 = table.Column<float>(type: "real", nullable: true),
+                    IgG4 = table.Column<float>(type: "real", nullable: true),
+                    TestRequestTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    SampleCollectionTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    SampleAcceptTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpertApproveTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PatientId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TestResults", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TestResults_Users_PatientId",
+                        column: x => x.PatientId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_RefreshTokens_UserId",
                 table: "RefreshTokens",
                 column: "UserId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TestResults_PatientId",
+                table: "TestResults",
+                column: "PatientId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_Email",
@@ -217,6 +252,9 @@ namespace E_Lab_Backend.Migrations
 
             migrationBuilder.DropTable(
                 name: "RefreshTokens");
+
+            migrationBuilder.DropTable(
+                name: "TestResults");
 
             migrationBuilder.DropTable(
                 name: "Users");

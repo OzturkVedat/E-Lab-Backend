@@ -4,8 +4,7 @@ namespace E_Lab_Backend.Models
     public class UserModel 
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
-        public string FullName { get; set; } = string.Empty;
-        public int TC {  get; set; }
+        public string FullName { get; set; } 
         public GenderEnum Gender { get; set; }
         public DateOnly BirthDate { get; set; }
         public string Email {  get; set; }

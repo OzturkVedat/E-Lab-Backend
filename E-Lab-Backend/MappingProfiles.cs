@@ -16,6 +16,7 @@ namespace E_Lab_Backend
                         (DateTime.UtcNow.Year - src.Patient.BirthDate.Year) * 12 +
                         (DateTime.UtcNow.Month - src.Patient.BirthDate.Month)));
 
+            CreateMap<RegisterDto, UserModel>();
         }
 
     }
