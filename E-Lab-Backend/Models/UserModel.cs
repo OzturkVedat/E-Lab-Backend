@@ -5,14 +5,15 @@ namespace E_Lab_Backend.Models
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public string FullName { get; set; } = string.Empty;
+        public int TC {  get; set; }
+        public GenderEnum Gender { get; set; }
+        public DateOnly BirthDate { get; set; }
         public string Email {  get; set; }
         public string PasswordHashed {  get; set; }
-        public DateOnly BirthDate { get; set; }
         public string Role { get; set; } = "User";
         public RefreshToken? RefreshToken { get; set; }
 
-        public GenderEnum Gender { get; set; }
-
+        public ICollection<TestResult> TestResults { get; set; } = [];
         public int GetAgeInMonths()
         {
             DateOnly currentDate = DateOnly.FromDateTime(DateTime.UtcNow);

@@ -20,4 +20,6 @@
         public float IgG4LowerLimit { get; set; }
         public float IgG4UpperLimit { get; set; }
     }
+
+   
 }

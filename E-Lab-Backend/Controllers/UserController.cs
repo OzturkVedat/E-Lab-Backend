@@ -9,13 +9,13 @@ namespace E_Lab_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles ="User")]
+    [Authorize(Roles = "User")]
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
         private readonly ITestResultRepository _testResultRepository;
         private readonly ILogger<UserController> _logger;
-        public UserController(IUserRepository userRepository, ITestResultRepository testResultRepository, ILogger<UserController> logger)
+        public UserController(IUserRepository userRepository,ITestResultRepository testResultRepository, ILogger<UserController> logger)
         {
             _userRepository = userRepository;
             _testResultRepository = testResultRepository;
@@ -27,30 +27,30 @@ namespace E_Lab_Backend.Controllers
         {
             var idClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             if (idClaim == null)
-                return Unauthorized("Yetkisiz erişim.");
+                return Unauthorized(new FailureResult("Yetkisiz erisim."));
             var result = await _userRepository.GetUserDetails(idClaim.Value);
             return result is SuccessDataResult<UserDto> ?
                 Ok(result) : BadRequest(result);
         }
 
-        [HttpGet("get-all-results")]
-        public async Task<IActionResult> GetTestResultsOfUser()
+        [HttpGet("user-test-results")]
+        public async Task<IActionResult> GetAuthenticatedUserTestResults()
         {
             var idClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             if (idClaim == null)
-                return Unauthorized("Yetkisiz erişim.");
-
-            var result = await _testResultRepository.GetUserTestResults(idClaim.Value);
-            return result is SuccessDataResult<List<TestResultPatient>> ?
-                Ok(result) : BadRequest(result);
+                return Unauthorized(new FailureResult("Yetkisiz erisim."));
+            
+            var result= await _testResultRepository.GetAllTestResultsOfUser(idClaim.Value);
+            return result is FailureResult ? BadRequest(result) : Ok(result);
         }
+
 
         [HttpDelete("remove-account")]
         public async Task<IActionResult> RemoveAuthenticatedUser()
         {
-            var idClaim= User.FindFirst(ClaimTypes.NameIdentifier);
+            var idClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             if (idClaim == null)
-                return Unauthorized("Yetkiniz bulunmamaktadır.");
+                return Unauthorized(new FailureResult("Yetkiniz bulunmamaktadır."));
 
             var result = await _userRepository.DeleteUser(idClaim.Value);
             return result is SuccessResult ? Ok(result) : BadRequest(result);

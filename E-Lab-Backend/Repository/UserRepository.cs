@@ -17,7 +17,7 @@ namespace E_Lab_Backend.Repository
         {
             var user = await _context.Users.FindAsync(id);
             return (user == null) ?
-            new FailureResult("Kullanıcı bulunamadı.") : new SuccessDataResult<UserModel>(user);
+            new FailureResult("Kullanici bulunamadı.") : new SuccessDataResult<UserModel>(user);
         }
 
         public async Task<ResultModel> GetUserDetails(string id)
@@ -57,7 +57,7 @@ namespace E_Lab_Backend.Repository
                 .FirstOrDefaultAsync();
 
             return (user == null) ?
-            new FailureResult("Kullanıcı bulunamadı.") : new SuccessDataResult<UserModel>(user);
+            new FailureResult("Kullanici bulunamadi.") : new SuccessDataResult<UserModel>(user);
         }
 
         public async Task<bool> UserExists(string userId)
@@ -70,17 +70,17 @@ namespace E_Lab_Backend.Repository
             await _context.Users.AddAsync(user);
             var result = await _context.SaveChangesAsync();
             return result > 0 ?
-                new SuccessResult("Kullanıcı başarıyla kaydedildi.") : new FailureResult("Kullanıcı kaydedilemedi.");
+                new SuccessResult("Kullanici başarıyla kaydedildi.") : new FailureResult("Kullanici kaydedilemedi.");
         }
 
         public async Task<ResultModel> DeleteUser(string id)
         {
             var user = await _context.Users.FindAsync(id);
             if (user == null)
-                return new FailureResult("Kullanıcı bulunamadı.");
+                return new FailureResult("Kullanici bulunamadi.");
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
-            return new SuccessResult("Kullanıcı kaydı başarıyla silindi.");
+            return new SuccessResult("Kullanici kaydi basariyla silindi.");
         }
     }
 }

@@ -50,7 +50,6 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<ITestResultRepository,TestResultRepository>();
 builder.Services.AddScoped<DbSeeder>();
 
 builder.Services.AddAuthentication(options =>

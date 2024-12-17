@@ -5,54 +5,69 @@ using Microsoft.IdentityModel.Tokens;
 using E_Lab_Backend.Dto;
 using E_Lab_Backend.Models;
 using E_Lab_Backend.Interface;
+using System.Reflection.Metadata.Ecma335;
 
 namespace E_Lab_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles ="Admin")]
+    [Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
     {
-        private readonly ITestResultRepository _testResultRepository;
         private readonly IUserRepository _userRepository;
-        public AdminController(ITestResultRepository testResultRepository,IUserRepository userRepository)
+        private readonly ITestResultRepository _testResultRepository;
+        public AdminController(IUserRepository userRepository, ITestResultRepository testResultRepository)
         {
-            _testResultRepository = testResultRepository;
             _userRepository = userRepository;
-        }
-
-        [HttpGet("test-result/{resultId}")]
-        public async Task<IActionResult> GetTestResultById(string resultId)
-        {
-            if (resultId.IsNullOrEmpty())
-                return BadRequest(new FailureResult("Invalid ID."));
-
-            var result= await _testResultRepository.GetTestResultById(resultId);
-            return result is SuccessDataResult<TestResultPatient> ? Ok(result) : BadRequest(result);
-        }
-
-        [HttpGet("all-test-results")]
-        public async Task<IActionResult> GetAllTestResults()
-        {
-            var result = await _testResultRepository.GetAllTestResults();
-            return result is SuccessDataResult<List<TestResultPatient>> ?
-                Ok(result) : BadRequest(result);
+            _testResultRepository = testResultRepository;
         }
 
         [HttpGet("all-patient-details")]
         public async Task<IActionResult> GetAllPatientDetails()
         {
-            var result= await _userRepository.GetAllPatientDetails();
+            var result = await _userRepository.GetAllPatientDetails();
             return result is SuccessDataResult<List<PatientDetails>> ?
                 Ok(result) : BadRequest(result);
         }
 
-        [HttpPost("new-test-result")]
-        public async Task<IActionResult> AddNewTestResult(NewTestResultDto dto)
+        [HttpGet("patient-test-results/{patientId}")]
+        public async Task<IActionResult> GetPatientTestResultsById(string patientId)
         {
-            var result = await _testResultRepository.AddNewTestResult(dto);
-            return result is SuccessResult ? Ok(result) : BadRequest(result);
+            if (patientId.IsNullOrEmpty())
+                return BadRequest(new FailureResult("patientId degeri bos olamaz."));
+
+            var results = await _testResultRepository.GetAllTestResultsOfUser(patientId);
+            return results is FailureResult ?
+                BadRequest(results) : Ok(results);
         }
+
+        [HttpGet("test-result-details/{testResultId}")]
+        public async Task<IActionResult> GetTestResultDetailsById(string testResultId)
+        {
+            if (testResultId.IsNullOrEmpty())
+                return BadRequest(new FailureResult("testResultId degeri bos olamaz."));
+
+            var detailsResult= await _testResultRepository.GetTestResultDetails(testResultId);
+            return detailsResult is FailureResult ? BadRequest(detailsResult) : Ok(detailsResult);
+        }
+
+        [HttpPost("new-test-result")]
+        public async Task<IActionResult> AddNewTestResult([FromBody] NewTestResultDto dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values
+                            .SelectMany(v => v.Errors)
+                            .Select(e => e.ErrorMessage)
+                            .ToList();
+                return BadRequest(new FailureResult("Validasyon hatasi.", errors));
+            }
+
+            var result = await _testResultRepository.AddNewTestResult(dto);
+            return result is SuccessResult ?
+                Ok(result) : BadRequest(result);
+        }
+
 
     }
 }

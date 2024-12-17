@@ -66,7 +66,7 @@ namespace E_Lab_Backend.Controllers
                 var errorMessages = string.Join(", ", ModelState.Values
                     .SelectMany(v => v.Errors)
                     .Select(e => e.ErrorMessage));
-                _logger.LogWarning("Login failed for {Email} due to invalid model state: {Errors}", dto.Email, errorMessages);
+                _logger.LogWarning("{Email} icin hatalar var: {Errors}", dto.Email, errorMessages);
                 return BadRequest(new FailureResult(errorMessages));
             }
 

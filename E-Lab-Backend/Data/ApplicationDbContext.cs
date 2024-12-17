@@ -12,6 +12,8 @@ namespace E_Lab_Backend.Data
 
         public DbSet<UserModel> Users { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<TestResult> TestResults { get; set; }
+
         public DbSet<IgManualOs> IgsManualOs {  get; set; }
         public DbSet<IgManualTjp> IgsManualTjp { get; set; }
         public DbSet<IgManualCilvPrimer> IgsManualCilvPrimer { get; set; }
@@ -21,8 +23,6 @@ namespace E_Lab_Backend.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(builder);
-
             builder.Entity<UserModel>()
                 .HasOne(u => u.RefreshToken)
                 .WithOne(r => r.User)
@@ -33,6 +33,13 @@ namespace E_Lab_Backend.Data
                 .HasIndex(u => u.Email)
                 .IsUnique();
 
+            builder.Entity<TestResult>()
+                .HasOne(tr=> tr.Patient)
+                .WithMany(u=> u.TestResults)
+                .HasForeignKey(tr=>tr.PatientId)
+                .OnDelete(DeleteBehavior.Cascade);  // cascade delete if user model is deleted
+
+            base.OnModelCreating(builder);
         }
     }
 }

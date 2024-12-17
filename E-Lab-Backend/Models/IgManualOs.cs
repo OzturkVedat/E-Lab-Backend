@@ -14,4 +14,6 @@
         public float MaxValue { get; set; }
         public float PValue {  get; set; }
     }
+
+   
 }

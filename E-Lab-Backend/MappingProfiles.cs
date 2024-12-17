@@ -4,12 +4,18 @@ using E_Lab_Backend.Models;
 
 namespace E_Lab_Backend
 {
-    public class MappingProfiles:Profile
+    public class MappingProfiles : Profile
     {
         public MappingProfiles()
         {
-            CreateMap<TestResultDto, TestResultPatient>().ReverseMap();
-            CreateMap<NewTestResultDto, TestResultPatient>().ReverseMap();
+            CreateMap<TestResultDto, TestResult>().ReverseMap();
+
+            CreateMap<TestResult, TestResultDetails>()
+                .ForMember(dest => dest.AgeInMonths, opt =>
+                    opt.MapFrom(src =>
+                        (DateTime.UtcNow.Year - src.Patient.BirthDate.Year) * 12 +
+                        (DateTime.UtcNow.Month - src.Patient.BirthDate.Month)));
+
         }
 
     }
