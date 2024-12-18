@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace E_Lab_Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241217160610_init")]
+    [Migration("20241218184947_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -54,10 +54,10 @@ namespace E_Lab_Backend.Migrations
                     b.Property<float>("IgG2UpperLimit")
                         .HasColumnType("real");
 
-                    b.Property<float>("IgG3GUpperLimit")
+                    b.Property<float>("IgG3LowerLimit")
                         .HasColumnType("real");
 
-                    b.Property<float>("IgG3LowerLimit")
+                    b.Property<float>("IgG3UpperLimit")
                         .HasColumnType("real");
 
                     b.Property<float>("IgG4LowerLimit")
@@ -140,10 +140,10 @@ namespace E_Lab_Backend.Migrations
                     b.Property<float>("IgG2UpperLimit")
                         .HasColumnType("real");
 
-                    b.Property<float>("IgG3GUpperLimit")
+                    b.Property<float>("IgG3LowerLimit")
                         .HasColumnType("real");
 
-                    b.Property<float>("IgG3LowerLimit")
+                    b.Property<float>("IgG3UpperLimit")
                         .HasColumnType("real");
 
                     b.Property<float>("IgG4LowerLimit")

@@ -15,5 +15,19 @@
         public float PValue {  get; set; }
     }
 
-   
+    public class ManualOsResult
+    {
+        public string ReferencedManualName { get; set; } = "ManualOs";
+
+        public List<IgOsRangesResult> IgOsRangesResults { get; set; }
+    }
+
+    public class IgOsRangesResult
+    {
+        public IgTypeEnum IgType { get; set; }
+        public string ArithMeanResult { get; set; }
+        public string MinMaxResult { get; set; }
+
+    }
+
 }

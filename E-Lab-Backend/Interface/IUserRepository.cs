@@ -11,6 +11,7 @@ namespace E_Lab_Backend.Interface
         Task<ResultModel> GetUserByEmail(string email);
         Task<bool> UserExists(string userId);
         Task<ResultModel> AddUser(UserModel user);
+        Task<ResultModel> UpdateUserDetails(string userId, UserUpdateDto dto);
         Task<ResultModel> DeleteUser(string id);
     }
 }

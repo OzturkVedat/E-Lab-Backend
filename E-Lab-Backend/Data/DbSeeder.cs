@@ -93,8 +93,8 @@ namespace E_Lab_Backend.Data
             {
                 new RegisterDto { FullName = "M.A.", Email = "ma@email.com", Password = "mapassword123", BirthDate = new DateOnly(2022,02,21), Gender=GenderEnum.Male },
                 new RegisterDto { FullName = "M.E.C.", Email = "mec@email.com", Password = "mecpassword123", BirthDate = new DateOnly(2021,03,24), Gender=GenderEnum.Male },
-                new RegisterDto { FullName = "A.K.", Email = "ak@email.com", Password = "akpasswordak123", BirthDate = new DateOnly(2019,12,20), Gender=GenderEnum.Female },
-                new RegisterDto { FullName = "Y.K.", Email = "yk@email.com", Password = "ykpasswordak123", BirthDate = new DateOnly(2022,05,10), Gender=GenderEnum.Female }
+                new RegisterDto { FullName = "A.K.", Email = "ak@email.com", Password = "akpassword123", BirthDate = new DateOnly(2019,12,20), Gender=GenderEnum.Female },
+                new RegisterDto { FullName = "Y.K.", Email = "yk@email.com", Password = "ykpassword123", BirthDate = new DateOnly(2022,05,10), Gender=GenderEnum.Female }
             };
 
             foreach (var patient in patients)
@@ -125,10 +125,23 @@ namespace E_Lab_Backend.Data
 
                 var testRes = new List<TestResult>
                 {
-                    new TestResult{PatientId=userMa.Data.Id, IgG=766 , IgA=49.4f , IgM=58, },
-                    new TestResult{PatientId=userMec.Data.Id, IgG=641 , IgA=43 , IgM=28, IgG1=418 , IgG2=254 , IgG3=18 , IgG4=9.4f },
-                    new TestResult{PatientId=userAk.Data.Id, IgG=866 , IgA=126 , IgM=74.8f, IgG1=546 , IgG2=199 , IgG3=13 , IgG4=6.9f },
-                    new TestResult{PatientId=userYk.Data.Id, IgG=636 , IgA=83 , IgM=44.6f, IgG1=420 , IgG2=227 , IgG3=24 , IgG4=9.2f },
+                    new TestResult{PatientId=userMa.Data.Id, IgG=766 , IgA=49.4f , IgM=58, ExpertApproveTime= new DateTime(2024, 11, 07) },
+                    new TestResult{PatientId=userMa.Data.Id, IgG=526 , IgA=49.4f , IgM=63, ExpertApproveTime= new DateTime(2024, 05, 09) },
+                    new TestResult{PatientId=userMa.Data.Id, IgG=519 , IgA=49.4f , IgM=104, ExpertApproveTime= new DateTime(2023, 03, 30) },
+
+
+                    new TestResult{PatientId=userMec.Data.Id, IgG=641 , IgA=43 , IgM=28, IgG1=418 , IgG2=254 , IgG3=18 , IgG4=9.4f, ExpertApproveTime= new DateTime(2024, 08, 12) },
+                    new TestResult{PatientId=userMec.Data.Id, IgG=704 , IgA=null , IgM=23, IgG1=null , IgG2=null , IgG3=null , IgG4=null, ExpertApproveTime= new DateTime(2024, 02, 13) },
+                    new TestResult{PatientId=userMec.Data.Id, IgG=865 , IgA=null , IgM=23, IgG1=null , IgG2=null , IgG3=null , IgG4=null, ExpertApproveTime= new DateTime(2023, 09, 12) },
+
+                    new TestResult{PatientId=userAk.Data.Id, IgG=866 , IgA=74.8f , IgM=126, IgG1=546 , IgG2=199, IgG3=13, IgG4=6.9f, ExpertApproveTime= new DateTime(2024, 10, 07) },
+                    new TestResult{PatientId=userAk.Data.Id, IgG=610 , IgA=75.6f , IgM=114, IgG1=392 , IgG2=135, IgG3=14, IgG4=3, ExpertApproveTime= new DateTime(2024, 07, 16) },
+                    new TestResult{PatientId=userAk.Data.Id, IgG=697 , IgA=109 , IgM=131, IgG1=434 , IgG2=121, IgG3=14, IgG4=3.7f, ExpertApproveTime= new DateTime(2024, 07, 02) },
+
+                    new TestResult{PatientId=userYk.Data.Id, IgG=636 , IgA=44.6f , IgM=83, IgG1=420 , IgG2=227 , IgG3=24 , IgG4=9.2f, ExpertApproveTime= new DateTime(2024, 08, 12) },
+                    new TestResult{PatientId=userYk.Data.Id, IgG=630 , IgA=24.8f , IgM=82, IgG1=null , IgG2=null , IgG3=null , IgG4=null, ExpertApproveTime= new DateTime(2024, 02, 16) },
+                    new TestResult{PatientId=userYk.Data.Id, IgG=475 , IgA=29 , IgM=105, IgG1=null , IgG2=null , IgG3=null , IgG4=null, ExpertApproveTime= new DateTime(2023, 11, 13) },
+
                 };
                 await _context.TestResults.AddRangeAsync(testRes);
                 await _context.SaveChangesAsync();
@@ -175,59 +188,59 @@ namespace E_Lab_Backend.Data
 
             var igMList = new List<IgManualTubitak>
             {
-                new IgManualTubitak { AgeInMonthsLowerLimit = 0, AgeInMonthsUpperLimit = 1, GeometricMean = 16.89f, GMStandardDeviation = 8.87f, Mean = 20.38f, MeanStandardDeviation = 8.87f, MinValue = 5.1f, MaxValue = 50.9f, CILowerLimit = 15.57f, CIUpperLimit = 25.18f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 2, AgeInMonthsUpperLimit = 3, GeometricMean = 34.21f, GMStandardDeviation = 13.55f, Mean = 36.66f, MeanStandardDeviation = 13.55f, MinValue = 15.2f, MaxValue = 68.5f, CILowerLimit = 31.60f, CIUpperLimit = 41.72f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 4, AgeInMonthsUpperLimit = 6, GeometricMean = 69.05f, GMStandardDeviation = 29.73f, Mean = 75.44f, MeanStandardDeviation = 29.73f, MinValue = 26.9f, MaxValue = 130f, CILowerLimit = 64.34f, CIUpperLimit = 86.54f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 7, AgeInMonthsUpperLimit = 12, GeometricMean = 73.42f, GMStandardDeviation = 35.76f, Mean = 81.05f, MeanStandardDeviation = 35.76f, MinValue = 24.2f, MaxValue = 162f, CILowerLimit = 67.7f, CIUpperLimit = 94.41f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 13, AgeInMonthsUpperLimit = 24, GeometricMean = 115.25f, GMStandardDeviation = 41.63f, Mean = 122.57f, MeanStandardDeviation = 41.63f, MinValue = 38.6f, MaxValue = 195f, CILowerLimit = 107.03f, CIUpperLimit = 138.12f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 25, AgeInMonthsUpperLimit = 36, GeometricMean = 104.66f, GMStandardDeviation = 40.55f, Mean = 111.31f, MeanStandardDeviation = 40.55f, MinValue = 42.7f, MaxValue = 236f, CILowerLimit = 96.17f, CIUpperLimit = 126.46f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 37, AgeInMonthsUpperLimit = 60, GeometricMean = 115.60f, GMStandardDeviation = 39.24f, Mean = 121.79f, MeanStandardDeviation = 39.24f, MinValue = 58.7f, MaxValue = 198f, CILowerLimit = 107.13f, CIUpperLimit = 136.44f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 61, AgeInMonthsUpperLimit = 96, GeometricMean = 108.05f, GMStandardDeviation = 41.27f, Mean = 114.73f, MeanStandardDeviation = 41.27f, MinValue = 50.3f, MaxValue = 242f, CILowerLimit = 99.32f, CIUpperLimit = 130.14f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 97, AgeInMonthsUpperLimit = 132, GeometricMean = 119.16f, GMStandardDeviation = 39.31f, Mean = 125.78f, MeanStandardDeviation = 39.31f, MinValue = 42.4f, MaxValue = 197f, CILowerLimit = 111.1f, CIUpperLimit = 140.46f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 133, AgeInMonthsUpperLimit = 192, GeometricMean = 130.60f, GMStandardDeviation = 64.32f, Mean = 142.54f, MeanStandardDeviation = 64.32f, MinValue = 60.7f, MaxValue = 323f, CILowerLimit = 118.53f, CIUpperLimit = 166.55f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 193, AgeInMonthsUpperLimit = 216, GeometricMean = 130.60f, GMStandardDeviation = 64.32f, Mean = 142.54f, MeanStandardDeviation = 64.32f, MinValue = 60.7f, MaxValue = 323f, CILowerLimit = 118.53f, CIUpperLimit = 166.55f }
+                new IgManualTubitak { AgeInMonthsLowerLimit = 0, AgeInMonthsUpperLimit = 1, IgType = IgTypeEnum.IgM, GeometricMean = 16.89f, GMStandardDeviation = 8.87f, Mean = 20.38f, MeanStandardDeviation = 8.87f, MinValue = 5.1f, MaxValue = 50.9f, CILowerLimit = 15.57f, CIUpperLimit = 25.18f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 2, AgeInMonthsUpperLimit = 3, IgType = IgTypeEnum.IgM, GeometricMean = 34.21f, GMStandardDeviation = 13.55f, Mean = 36.66f, MeanStandardDeviation = 13.55f, MinValue = 15.2f, MaxValue = 68.5f, CILowerLimit = 31.60f, CIUpperLimit = 41.72f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 4, AgeInMonthsUpperLimit = 6, IgType = IgTypeEnum.IgM, GeometricMean = 69.05f, GMStandardDeviation = 29.73f, Mean = 75.44f, MeanStandardDeviation = 29.73f, MinValue = 26.9f, MaxValue = 130f, CILowerLimit = 64.34f, CIUpperLimit = 86.54f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 7, AgeInMonthsUpperLimit = 12, IgType = IgTypeEnum.IgM, GeometricMean = 73.42f, GMStandardDeviation = 35.76f, Mean = 81.05f, MeanStandardDeviation = 35.76f, MinValue = 24.2f, MaxValue = 162f, CILowerLimit = 67.7f, CIUpperLimit = 94.41f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 13, AgeInMonthsUpperLimit = 24, IgType = IgTypeEnum.IgM, GeometricMean = 115.25f, GMStandardDeviation = 41.63f, Mean = 122.57f, MeanStandardDeviation = 41.63f, MinValue = 38.6f, MaxValue = 195f, CILowerLimit = 107.03f, CIUpperLimit = 138.12f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 25, AgeInMonthsUpperLimit = 36, IgType = IgTypeEnum.IgM, GeometricMean = 104.66f, GMStandardDeviation = 40.55f, Mean = 111.31f, MeanStandardDeviation = 40.55f, MinValue = 42.7f, MaxValue = 236f, CILowerLimit = 96.17f, CIUpperLimit = 126.46f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 37, AgeInMonthsUpperLimit = 60, IgType = IgTypeEnum.IgM, GeometricMean = 115.60f, GMStandardDeviation = 39.24f, Mean = 121.79f, MeanStandardDeviation = 39.24f, MinValue = 58.7f, MaxValue = 198f, CILowerLimit = 107.13f, CIUpperLimit = 136.44f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 61, AgeInMonthsUpperLimit = 96, IgType = IgTypeEnum.IgM, GeometricMean = 108.05f, GMStandardDeviation = 41.27f, Mean = 114.73f, MeanStandardDeviation = 41.27f, MinValue = 50.3f, MaxValue = 242f, CILowerLimit = 99.32f, CIUpperLimit = 130.14f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 97, AgeInMonthsUpperLimit = 132, IgType = IgTypeEnum.IgM, GeometricMean = 119.16f, GMStandardDeviation = 39.31f, Mean = 125.78f, MeanStandardDeviation = 39.31f, MinValue = 42.4f, MaxValue = 197f, CILowerLimit = 111.1f, CIUpperLimit = 140.46f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 133, AgeInMonthsUpperLimit = 192, IgType = IgTypeEnum.IgM, GeometricMean = 130.60f, GMStandardDeviation = 64.32f, Mean = 142.54f, MeanStandardDeviation = 64.32f, MinValue = 60.7f, MaxValue = 323f, CILowerLimit = 118.53f, CIUpperLimit = 166.55f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 193, AgeInMonthsUpperLimit = 216, IgType = IgTypeEnum.IgM, GeometricMean = 130.60f, GMStandardDeviation = 64.32f, Mean = 142.54f, MeanStandardDeviation = 64.32f, MinValue = 60.7f, MaxValue = 323f, CILowerLimit = 118.53f, CIUpperLimit = 166.55f }
             };
 
 
             var igG1List = new List<IgManualTubitak>
             {
-                new IgManualTubitak { AgeInMonthsLowerLimit = 25, AgeInMonthsUpperLimit = 36, GeometricMean = 510.74f, GMStandardDeviation = 192.04f, Mean = 531.7f, MeanStandardDeviation = 192.04f, MinValue = 309f, MaxValue = 1450f, CILowerLimit = 459.98f, CIUpperLimit = 603.41f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 37, AgeInMonthsUpperLimit = 60, GeometricMean = 506.73f, GMStandardDeviation = 82.28f, Mean = 513.93f, MeanStandardDeviation = 82.28f, MinValue = 273f, MaxValue = 679f, CILowerLimit = 483.20f, CIUpperLimit = 544.65f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 61, AgeInMonthsUpperLimit = 96, GeometricMean = 567.94f, GMStandardDeviation = 121.64f, Mean = 581f, MeanStandardDeviation = 121.64f, MinValue = 292f, MaxValue = 781f, CILowerLimit = 535.87f, CIUpperLimit = 626.72f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 97, AgeInMonthsUpperLimit = 132, GeometricMean = 634.17f, GMStandardDeviation = 216.39f, Mean = 660.23f, MeanStandardDeviation = 216.39f, MinValue = 410f, MaxValue = 1530f, CILowerLimit = 579.43f, CIUpperLimit = 741.03f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 133, AgeInMonthsUpperLimit = 192, GeometricMean = 635.52f, GMStandardDeviation = 131.01f, Mean = 648.53f, MeanStandardDeviation = 131.01f, MinValue = 344f, MaxValue = 958f, CILowerLimit = 599.61f, CIUpperLimit = 697.45f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 193, AgeInMonthsUpperLimit = 216, GeometricMean = 645.35f, GMStandardDeviation = 229.62f, Mean = 674.5f, MeanStandardDeviation = 229.62f, MinValue = 403f, MaxValue = 1520f, CILowerLimit = 588.75f, CIUpperLimit = 760.24f }
+                new IgManualTubitak { AgeInMonthsLowerLimit = 25, AgeInMonthsUpperLimit = 36, IgType = IgTypeEnum.IgG1, GeometricMean = 510.74f, GMStandardDeviation = 192.04f, Mean = 531.7f, MeanStandardDeviation = 192.04f, MinValue = 309f, MaxValue = 1450f, CILowerLimit = 459.98f, CIUpperLimit = 603.41f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 37, AgeInMonthsUpperLimit = 60, IgType = IgTypeEnum.IgG1, GeometricMean = 506.73f, GMStandardDeviation = 82.28f, Mean = 513.93f, MeanStandardDeviation = 82.28f, MinValue = 273f, MaxValue = 679f, CILowerLimit = 483.20f, CIUpperLimit = 544.65f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 61, AgeInMonthsUpperLimit = 96, IgType = IgTypeEnum.IgG1, GeometricMean = 567.94f, GMStandardDeviation = 121.64f, Mean = 581f, MeanStandardDeviation = 121.64f, MinValue = 292f, MaxValue = 781f, CILowerLimit = 535.87f, CIUpperLimit = 626.72f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 97, AgeInMonthsUpperLimit = 132, IgType = IgTypeEnum.IgG1, GeometricMean = 634.17f, GMStandardDeviation = 216.39f, Mean = 660.23f, MeanStandardDeviation = 216.39f, MinValue = 410f, MaxValue = 1530f, CILowerLimit = 579.43f, CIUpperLimit = 741.03f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 133, AgeInMonthsUpperLimit = 192, IgType = IgTypeEnum.IgG1, GeometricMean = 635.52f, GMStandardDeviation = 131.01f, Mean = 648.53f, MeanStandardDeviation = 131.01f, MinValue = 344f, MaxValue = 958f, CILowerLimit = 599.61f, CIUpperLimit = 697.45f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 193, AgeInMonthsUpperLimit = 216, IgType = IgTypeEnum.IgG1, GeometricMean = 645.35f, GMStandardDeviation = 229.62f, Mean = 674.5f, MeanStandardDeviation = 229.62f, MinValue = 403f, MaxValue = 1520f, CILowerLimit = 588.75f, CIUpperLimit = 760.24f }
             };
 
 
             var igG2List = new List<IgManualTubitak>
             {
-                new IgManualTubitak { AgeInMonthsLowerLimit = 25, AgeInMonthsUpperLimit = 36, GeometricMean = 137.88f, GMStandardDeviation = 38.59f, Mean = 141.98f, MeanStandardDeviation = 38.59f, MinValue = 87.6f, MaxValue = 289f, CILowerLimit = 127.57f, CIUpperLimit = 156.39f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 37, AgeInMonthsUpperLimit = 60, GeometricMean = 143.92f, GMStandardDeviation = 50.80f, Mean = 151.95f, MeanStandardDeviation = 50.80f, MinValue = 73.3f, MaxValue = 271f, CILowerLimit = 132.98f, CIUpperLimit = 170.92f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 61, AgeInMonthsUpperLimit = 96, GeometricMean = 196.57f, GMStandardDeviation = 86.41f, Mean = 213.67f, MeanStandardDeviation = 86.41f, MinValue = 88.1f, MaxValue = 408f, CILowerLimit = 181.40f, CIUpperLimit = 245.93f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 97, AgeInMonthsUpperLimit = 132, GeometricMean = 250.67f, GMStandardDeviation = 85.72f, Mean = 265.56f, MeanStandardDeviation = 85.72f, MinValue = 81f, MaxValue = 442f, CILowerLimit = 233.55f, CIUpperLimit = 297.57f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 133, AgeInMonthsUpperLimit = 192, GeometricMean = 261.62f, GMStandardDeviation = 69.14f, Mean = 270.23f, MeanStandardDeviation = 69.14f, MinValue = 159f, MaxValue = 406f, CILowerLimit = 244.41f, CIUpperLimit = 296.05f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 193, AgeInMonthsUpperLimit = 216, GeometricMean = 359.76f, GMStandardDeviation = 115.83f, Mean = 375.9f, MeanStandardDeviation = 115.83f, MinValue = 184f, MaxValue = 696f, CILowerLimit = 332.6f, CIUpperLimit = 419.15f }
+                new IgManualTubitak { AgeInMonthsLowerLimit = 25, AgeInMonthsUpperLimit = 36, IgType = IgTypeEnum.IgG2, GeometricMean = 137.88f, GMStandardDeviation = 38.59f, Mean = 141.98f, MeanStandardDeviation = 38.59f, MinValue = 87.6f, MaxValue = 289f, CILowerLimit = 127.57f, CIUpperLimit = 156.39f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 37, AgeInMonthsUpperLimit = 60, IgType = IgTypeEnum.IgG2, GeometricMean = 143.92f, GMStandardDeviation = 50.80f, Mean = 151.95f, MeanStandardDeviation = 50.80f, MinValue = 73.3f, MaxValue = 271f, CILowerLimit = 132.98f, CIUpperLimit = 170.92f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 61, AgeInMonthsUpperLimit = 96, IgType = IgTypeEnum.IgG2, GeometricMean = 196.57f, GMStandardDeviation = 86.41f, Mean = 213.67f, MeanStandardDeviation = 86.41f, MinValue = 88.1f, MaxValue = 408f, CILowerLimit = 181.40f, CIUpperLimit = 245.93f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 97, AgeInMonthsUpperLimit = 132, IgType = IgTypeEnum.IgG2, GeometricMean = 250.67f, GMStandardDeviation = 85.72f, Mean = 265.56f, MeanStandardDeviation = 85.72f, MinValue = 81f, MaxValue = 442f, CILowerLimit = 233.55f, CIUpperLimit = 297.57f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 133, AgeInMonthsUpperLimit = 192, IgType = IgTypeEnum.IgG2, GeometricMean = 261.62f, GMStandardDeviation = 69.14f, Mean = 270.23f, MeanStandardDeviation = 69.14f, MinValue = 159f, MaxValue = 406f, CILowerLimit = 244.41f, CIUpperLimit = 296.05f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 193, AgeInMonthsUpperLimit = 216, IgType = IgTypeEnum.IgG2, GeometricMean = 359.76f, GMStandardDeviation = 115.83f, Mean = 375.9f, MeanStandardDeviation = 115.83f, MinValue = 184f, MaxValue = 696f, CILowerLimit = 332.6f, CIUpperLimit = 419.15f }
             };
 
             var igG3List = new List<IgManualTubitak>
             {
-                new IgManualTubitak { AgeInMonthsLowerLimit = 25, AgeInMonthsUpperLimit = 36, GeometricMean = 48.78f, GMStandardDeviation = 16.90f, Mean = 51.73f, MeanStandardDeviation = 16.90f, MinValue = 19.8f, MaxValue = 75f, CILowerLimit = 45.41f, CIUpperLimit = 58.04f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 37, AgeInMonthsUpperLimit = 60, GeometricMean = 44.05f, GMStandardDeviation = 21.55f, Mean = 45.26f, MeanStandardDeviation = 21.55f, MinValue = 20.8f, MaxValue = 93.2f, CILowerLimit = 37.21f, CIUpperLimit = 53.30f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 61, AgeInMonthsUpperLimit = 96, GeometricMean = 56.82f, GMStandardDeviation = 30.55f, Mean = 65.53f, MeanStandardDeviation = 30.55f, MinValue = 18.9f, MaxValue = 135f, CILowerLimit = 53.01f, CIUpperLimit = 78.06f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 97, AgeInMonthsUpperLimit = 132, GeometricMean = 77.59f, GMStandardDeviation = 37.37f, Mean = 84.19f, MeanStandardDeviation = 37.37f, MinValue = 34.1f, MaxValue = 200f, CILowerLimit = 70.24f, CIUpperLimit = 98.15f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 133, AgeInMonthsUpperLimit = 192, GeometricMean = 75.30f, GMStandardDeviation = 31.86f, Mean = 81.39f, MeanStandardDeviation = 31.86f, MinValue = 35.2f, MaxValue = 150f, CILowerLimit = 69.49f, CIUpperLimit = 93.28f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 193, AgeInMonthsUpperLimit = 216, GeometricMean = 86.33f, GMStandardDeviation = 43.29f, Mean = 95.12f, MeanStandardDeviation = 43.29f, MinValue = 29.3f, MaxValue = 200f, CILowerLimit = 78.95f, CIUpperLimit = 111.28f }
+                new IgManualTubitak { AgeInMonthsLowerLimit = 25, AgeInMonthsUpperLimit = 36, IgType = IgTypeEnum.IgG3, GeometricMean = 48.78f, GMStandardDeviation = 16.90f, Mean = 51.73f, MeanStandardDeviation = 16.90f, MinValue = 19.8f, MaxValue = 75f, CILowerLimit = 45.41f, CIUpperLimit = 58.04f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 37, AgeInMonthsUpperLimit = 60, IgType = IgTypeEnum.IgG3, GeometricMean = 44.05f, GMStandardDeviation = 21.55f, Mean = 45.26f, MeanStandardDeviation = 21.55f, MinValue = 20.8f, MaxValue = 93.2f, CILowerLimit = 37.21f, CIUpperLimit = 53.30f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 61, AgeInMonthsUpperLimit = 96, IgType = IgTypeEnum.IgG3, GeometricMean = 56.82f, GMStandardDeviation = 30.55f, Mean = 65.53f, MeanStandardDeviation = 30.55f, MinValue = 18.9f, MaxValue = 135f, CILowerLimit = 53.01f, CIUpperLimit = 78.06f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 97, AgeInMonthsUpperLimit = 132, IgType = IgTypeEnum.IgG3, GeometricMean = 77.59f, GMStandardDeviation = 37.37f, Mean = 84.19f, MeanStandardDeviation = 37.37f, MinValue = 34.1f, MaxValue = 200f, CILowerLimit = 70.24f, CIUpperLimit = 98.15f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 133, AgeInMonthsUpperLimit = 192, IgType = IgTypeEnum.IgG3, GeometricMean = 75.30f, GMStandardDeviation = 31.86f, Mean = 81.39f, MeanStandardDeviation = 31.86f, MinValue = 35.2f, MaxValue = 150f, CILowerLimit = 69.49f, CIUpperLimit = 93.28f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 193, AgeInMonthsUpperLimit = 216, IgType = IgTypeEnum.IgG3, GeometricMean = 86.33f, GMStandardDeviation = 43.29f, Mean = 95.12f, MeanStandardDeviation = 43.29f, MinValue = 29.3f, MaxValue = 200f, CILowerLimit = 78.95f, CIUpperLimit = 111.28f }
             };
 
             var igG4List = new List<IgManualTubitak>
             {
-                new IgManualTubitak { AgeInMonthsLowerLimit = 25, AgeInMonthsUpperLimit = 36, GeometricMean = 15.53f, GMStandardDeviation = 8.54f, Mean = 18.37f, MeanStandardDeviation = 8.54f, MinValue = 7.86f, MaxValue = 57.5f, CILowerLimit = 13.67f, CIUpperLimit = 23.07f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 37, AgeInMonthsUpperLimit = 60, GeometricMean = 30.81f, GMStandardDeviation = 15.42f, Mean = 40.75f, MeanStandardDeviation = 15.42f, MinValue = 7.86f, MaxValue = 122f, CILowerLimit = 28.84f, CIUpperLimit = 52.65f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 61, AgeInMonthsUpperLimit = 96, GeometricMean = 39.33f, GMStandardDeviation = 23.05f, Mean = 50.94f, MeanStandardDeviation = 23.05f, MinValue = 7.86f, MaxValue = 157f, CILowerLimit = 37.11f, CIUpperLimit = 64.77f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 97, AgeInMonthsUpperLimit = 132, GeometricMean = 25.36f, GMStandardDeviation = 15.39f, Mean = 35.51f, MeanStandardDeviation = 15.39f, MinValue = 7.86f, MaxValue = 93.8f, CILowerLimit = 24.95f, CIUpperLimit = 46.07f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 133, AgeInMonthsUpperLimit = 192, GeometricMean = 31.03f, GMStandardDeviation = 16.73f, Mean = 39.51f, MeanStandardDeviation = 16.73f, MinValue = 7.86f, MaxValue = 119f, CILowerLimit = 29.53f, CIUpperLimit = 49.49f },
-                new IgManualTubitak { AgeInMonthsLowerLimit = 193, AgeInMonthsUpperLimit = 216, GeometricMean = 38.89f, GMStandardDeviation = 23.08f, Mean = 50.16f, MeanStandardDeviation = 23.08f, MinValue = 7.86f, MaxValue = 157f, CILowerLimit = 36.32f, CIUpperLimit = 64.01f }
+                new IgManualTubitak { AgeInMonthsLowerLimit = 25, AgeInMonthsUpperLimit = 36, IgType = IgTypeEnum.IgG4, GeometricMean = 15.53f, GMStandardDeviation = 8.54f, Mean = 18.37f, MeanStandardDeviation = 8.54f, MinValue = 7.86f, MaxValue = 57.5f, CILowerLimit = 13.67f, CIUpperLimit = 23.07f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 37, AgeInMonthsUpperLimit = 60, IgType = IgTypeEnum.IgG4, GeometricMean = 30.81f, GMStandardDeviation = 15.42f, Mean = 40.75f, MeanStandardDeviation = 15.42f, MinValue = 7.86f, MaxValue = 122f, CILowerLimit = 28.84f, CIUpperLimit = 52.65f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 61, AgeInMonthsUpperLimit = 96, IgType = IgTypeEnum.IgG4, GeometricMean = 39.33f, GMStandardDeviation = 23.05f, Mean = 50.94f, MeanStandardDeviation = 23.05f, MinValue = 7.86f, MaxValue = 157f, CILowerLimit = 37.11f, CIUpperLimit = 64.77f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 97, AgeInMonthsUpperLimit = 132, IgType = IgTypeEnum.IgG4, GeometricMean = 25.36f, GMStandardDeviation = 15.39f, Mean = 35.51f, MeanStandardDeviation = 15.39f, MinValue = 7.86f, MaxValue = 93.8f, CILowerLimit = 24.95f, CIUpperLimit = 46.07f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 133, AgeInMonthsUpperLimit = 192, IgType = IgTypeEnum.IgG4, GeometricMean = 31.03f, GMStandardDeviation = 16.73f, Mean = 39.51f, MeanStandardDeviation = 16.73f, MinValue = 7.86f, MaxValue = 119f, CILowerLimit = 29.53f, CIUpperLimit = 49.49f },
+                new IgManualTubitak { AgeInMonthsLowerLimit = 193, AgeInMonthsUpperLimit = 216, IgType = IgTypeEnum.IgG4, GeometricMean = 38.89f, GMStandardDeviation = 23.08f, Mean = 50.16f, MeanStandardDeviation = 23.08f, MinValue = 7.86f, MaxValue = 157f, CILowerLimit = 36.32f, CIUpperLimit = 64.01f }
             };
 
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -256,37 +269,37 @@ namespace E_Lab_Backend.Data
             var manual = new List<IgManualAp>
             {
                 new IgManualAp{ AgeInMonthsLowerLimit= 0, AgeInMonthsUpperLimit= 5, IgGLowerLimit= 100, IgGUpperLimit= 134, IgG1LowerLimit= 56, IgG1UpperLimit= 215, IgG2LowerLimit= 0, IgG2UpperLimit= 82,
-                IgG3LowerLimit= 7.6f, IgG3GUpperLimit= 823, IgG4LowerLimit= 0, IgG4UpperLimit= 19.8f, IgALowerLimit= 7, IgAUpperLimit= 37, IgMLowerLimit= 26, IgMUpperLimit= 122 },
+                IgG3LowerLimit= 7.6f, IgG3UpperLimit= 823, IgG4LowerLimit= 0, IgG4UpperLimit= 19.8f, IgALowerLimit= 7, IgAUpperLimit= 37, IgMLowerLimit= 26, IgMUpperLimit= 122 },
 
                 new IgManualAp{ AgeInMonthsLowerLimit= 6, AgeInMonthsUpperLimit= 9, IgGLowerLimit= 164, IgGUpperLimit= 588, IgG1LowerLimit= 102, IgG1UpperLimit= 369, IgG2LowerLimit= 0, IgG2UpperLimit= 89,
-                IgG3LowerLimit= 11.9f, IgG3GUpperLimit= 74, IgG4LowerLimit= 0, IgG4UpperLimit= 19.8f, IgALowerLimit= 16, IgAUpperLimit= 50, IgMLowerLimit= 32, IgMUpperLimit= 132 },
+                IgG3LowerLimit= 11.9f, IgG3UpperLimit= 74, IgG4LowerLimit= 0, IgG4UpperLimit= 19.8f, IgALowerLimit= 16, IgAUpperLimit= 50, IgMLowerLimit= 32, IgMUpperLimit= 132 },
 
                 new IgManualAp{ AgeInMonthsLowerLimit= 10, AgeInMonthsUpperLimit= 15, IgGLowerLimit= 246, IgGUpperLimit= 904, IgG1LowerLimit= 160, IgG1UpperLimit= 562, IgG2LowerLimit= 24, IgG2UpperLimit= 98,
-                IgG3LowerLimit= 17.3f, IgG3GUpperLimit= 63.7f, IgG4LowerLimit= 0, IgG4UpperLimit= 22, IgALowerLimit= 27, IgAUpperLimit= 66, IgMLowerLimit= 40, IgMUpperLimit= 143 },
+                IgG3LowerLimit= 17.3f, IgG3UpperLimit= 63.7f, IgG4LowerLimit= 0, IgG4UpperLimit= 22, IgALowerLimit= 27, IgAUpperLimit= 66, IgMLowerLimit= 40, IgMUpperLimit= 143 },
 
                 new IgManualAp{ AgeInMonthsLowerLimit= 16, AgeInMonthsUpperLimit= 24, IgGLowerLimit= 313, IgGUpperLimit= 1170, IgG1LowerLimit= 209, IgG1UpperLimit= 724, IgG2LowerLimit= 35, IgG2UpperLimit= 105,
-                IgG3LowerLimit= 21.9f, IgG3GUpperLimit= 55.0f, IgG4LowerLimit= 0, IgG4UpperLimit= 23, IgALowerLimit= 36, IgAUpperLimit= 79, IgMLowerLimit= 46, IgMUpperLimit= 152 },
+                IgG3LowerLimit= 21.9f, IgG3UpperLimit= 55.0f, IgG4LowerLimit= 0, IgG4UpperLimit= 23, IgALowerLimit= 36, IgAUpperLimit= 79, IgMLowerLimit= 46, IgMUpperLimit= 152 },
 
                 new IgManualAp{ AgeInMonthsLowerLimit= 25, AgeInMonthsUpperLimit= 48, IgGLowerLimit= 295, IgGUpperLimit= 1156, IgG1LowerLimit= 158, IgG1UpperLimit= 721, IgG2LowerLimit= 39, IgG2UpperLimit= 176,
-                IgG3LowerLimit= 17, IgG3GUpperLimit= 84.7f, IgG4LowerLimit= 0.4f, IgG4UpperLimit= 49.1f, IgALowerLimit= 27, IgAUpperLimit= 246, IgMLowerLimit= 37, IgMUpperLimit= 184 },
+                IgG3LowerLimit= 17, IgG3UpperLimit= 84.7f, IgG4LowerLimit= 0.4f, IgG4UpperLimit= 49.1f, IgALowerLimit= 27, IgAUpperLimit= 246, IgMLowerLimit= 37, IgMUpperLimit= 184 },
 
                 new IgManualAp{ AgeInMonthsLowerLimit= 49, AgeInMonthsUpperLimit= 84, IgGLowerLimit= 386, IgGUpperLimit= 1470, IgG1LowerLimit= 209, IgG1UpperLimit= 902, IgG2LowerLimit= 44, IgG2UpperLimit= 316,
-                IgG3LowerLimit= 10.8f, IgG3GUpperLimit= 94.9f, IgG4LowerLimit= 0.8f, IgG4UpperLimit= 81.9f, IgALowerLimit= 29, IgAUpperLimit= 256, IgMLowerLimit= 37, IgMUpperLimit= 224 },
+                IgG3LowerLimit= 10.8f, IgG3UpperLimit= 94.9f, IgG4LowerLimit= 0.8f, IgG4UpperLimit= 81.9f, IgALowerLimit= 29, IgAUpperLimit= 256, IgMLowerLimit= 37, IgMUpperLimit= 224 },
 
                 new IgManualAp{ AgeInMonthsLowerLimit= 85, AgeInMonthsUpperLimit= 120, IgGLowerLimit= 462, IgGUpperLimit= 1682, IgG1LowerLimit= 253, IgG1UpperLimit= 1019, IgG2LowerLimit= 54, IgG2UpperLimit= 435,
-                IgG3LowerLimit= 8.5f, IgG3GUpperLimit= 1026, IgG4LowerLimit= 1, IgG4UpperLimit= 108.7f, IgALowerLimit= 34, IgAUpperLimit= 274, IgMLowerLimit= 38, IgMUpperLimit= 251 },
+                IgG3LowerLimit= 8.5f, IgG3UpperLimit= 1026, IgG4LowerLimit= 1, IgG4UpperLimit= 108.7f, IgALowerLimit= 34, IgAUpperLimit= 274, IgMLowerLimit= 38, IgMUpperLimit= 251 },
 
                 new IgManualAp{ AgeInMonthsLowerLimit= 121, AgeInMonthsUpperLimit= 156, IgGLowerLimit= 503, IgGUpperLimit= 1580, IgG1LowerLimit= 280, IgG1UpperLimit= 1030, IgG2LowerLimit= 66, IgG2UpperLimit= 502,
-                IgG3LowerLimit= 11.5f, IgG3GUpperLimit= 1053, IgG4LowerLimit= 1, IgG4UpperLimit= 121.9f, IgALowerLimit= 42, IgAUpperLimit= 295, IgMLowerLimit= 41, IgMUpperLimit= 255 },
+                IgG3LowerLimit= 11.5f, IgG3UpperLimit= 1053, IgG4LowerLimit= 1, IgG4UpperLimit= 121.9f, IgALowerLimit= 42, IgAUpperLimit= 295, IgMLowerLimit= 41, IgMUpperLimit= 255 },
 
                 new IgManualAp{ AgeInMonthsLowerLimit= 157, AgeInMonthsUpperLimit= 192, IgGLowerLimit= 509, IgGUpperLimit= 1580, IgG1LowerLimit= 289, IgG1UpperLimit= 934, IgG2LowerLimit= 82, IgG2UpperLimit= 516,
-                IgG3LowerLimit= 20, IgG3GUpperLimit= 1032, IgG4LowerLimit= 0.7f, IgG4UpperLimit= 121.7f, IgALowerLimit= 52, IgAUpperLimit= 319, IgMLowerLimit= 45, IgMUpperLimit= 244 },
+                IgG3LowerLimit= 20, IgG3UpperLimit= 1032, IgG4LowerLimit= 0.7f, IgG4UpperLimit= 121.7f, IgALowerLimit= 52, IgAUpperLimit= 319, IgMLowerLimit= 45, IgMUpperLimit= 244 },
 
                 new IgManualAp{ AgeInMonthsLowerLimit= 193, AgeInMonthsUpperLimit= 216, IgGLowerLimit= 487, IgGUpperLimit= 1327, IgG1LowerLimit= 283, IgG1UpperLimit= 772, IgG2LowerLimit= 98, IgG2UpperLimit= 486,
-                IgG3LowerLimit= 31.3f, IgG3GUpperLimit= 97.6f, IgG4LowerLimit= 0.3f, IgG4UpperLimit= 111, IgALowerLimit= 60, IgAUpperLimit= 337, IgMLowerLimit= 49, IgMUpperLimit= 201 },
+                IgG3LowerLimit= 31.3f, IgG3UpperLimit= 97.6f, IgG4LowerLimit= 0.3f, IgG4UpperLimit= 111, IgALowerLimit= 60, IgAUpperLimit= 337, IgMLowerLimit= 49, IgMUpperLimit= 201 },
 
                 new IgManualAp{ AgeInMonthsLowerLimit= 217, AgeInMonthsUpperLimit= 1200, IgGLowerLimit= 767, IgGUpperLimit= 1590, IgG1LowerLimit= 341, IgG1UpperLimit= 894, IgG2LowerLimit= 171, IgG2UpperLimit= 632,
-                IgG3LowerLimit= 18.4f, IgG3GUpperLimit= 1060, IgG4LowerLimit= 2.4f, IgG4UpperLimit= 121, IgALowerLimit= 61, IgAUpperLimit= 356, IgMLowerLimit= 37, IgMUpperLimit= 286 }
+                IgG3LowerLimit= 18.4f, IgG3UpperLimit= 1060, IgG4LowerLimit= 2.4f, IgG4UpperLimit= 121, IgALowerLimit= 61, IgAUpperLimit= 356, IgMLowerLimit= 37, IgMUpperLimit= 286 }
             };
             await _context.IgsManualAp.AddRangeAsync(manual);
             await _context.SaveChangesAsync();
@@ -310,18 +323,18 @@ namespace E_Lab_Backend.Data
         {
             var manual = new List<IgManualCilvSeconder>
             {
-                new IgManualCilvSeconder { AgeInMonthsLowerLimit= -9, AgeInMonthsUpperLimit= 0, IgG1LowerLimit= 435, IgG1UpperLimit= 1084, IgG2LowerLimit= 143, IgG2UpperLimit= 453, IgG3LowerLimit= 27, IgG3GUpperLimit= 146, IgG4LowerLimit= 1, IgG4UpperLimit= 47 },
-                new IgManualCilvSeconder { AgeInMonthsLowerLimit= 1, AgeInMonthsUpperLimit= 3, IgG1LowerLimit= 218, IgG1UpperLimit= 496, IgG2LowerLimit= 40, IgG2UpperLimit= 167, IgG3LowerLimit= 4, IgG3GUpperLimit= 23, IgG4LowerLimit= 1, IgG4UpperLimit= 120 },
-                new IgManualCilvSeconder { AgeInMonthsLowerLimit= 4, AgeInMonthsUpperLimit= 6, IgG1LowerLimit= 143, IgG1UpperLimit= 394, IgG2LowerLimit= 23, IgG2UpperLimit= 147, IgG3LowerLimit= 4, IgG3GUpperLimit= 100, IgG4LowerLimit= 1, IgG4UpperLimit= 120 },
-                new IgManualCilvSeconder { AgeInMonthsLowerLimit= 7, AgeInMonthsUpperLimit= 9, IgG1LowerLimit= 190, IgG1UpperLimit= 388, IgG2LowerLimit= 37, IgG2UpperLimit= 60, IgG3LowerLimit= 12, IgG3GUpperLimit= 62, IgG4LowerLimit= 1, IgG4UpperLimit= 120 },
-                new IgManualCilvSeconder { AgeInMonthsLowerLimit= 10, AgeInMonthsUpperLimit= 24, IgG1LowerLimit= 286, IgG1UpperLimit= 680, IgG2LowerLimit= 30, IgG2UpperLimit= 327, IgG3LowerLimit= 13, IgG3GUpperLimit= 82, IgG4LowerLimit= 1, IgG4UpperLimit= 120 },
-                new IgManualCilvSeconder { AgeInMonthsLowerLimit= 25, AgeInMonthsUpperLimit= 48, IgG1LowerLimit= 381, IgG1UpperLimit= 884, IgG2LowerLimit= 70, IgG2UpperLimit= 443, IgG3LowerLimit= 17, IgG3GUpperLimit= 90, IgG4LowerLimit= 1, IgG4UpperLimit= 120 },
-                new IgManualCilvSeconder { AgeInMonthsLowerLimit= 49, AgeInMonthsUpperLimit= 72, IgG1LowerLimit= 292, IgG1UpperLimit= 816, IgG2LowerLimit= 83, IgG2UpperLimit= 513, IgG3LowerLimit= 8, IgG3GUpperLimit= 111, IgG4LowerLimit= 2, IgG4UpperLimit= 112 },
-                new IgManualCilvSeconder { AgeInMonthsLowerLimit= 73, AgeInMonthsUpperLimit= 96, IgG1LowerLimit= 422, IgG1UpperLimit= 802, IgG2LowerLimit= 113, IgG2UpperLimit= 480, IgG3LowerLimit= 15, IgG3GUpperLimit= 133, IgG4LowerLimit= 1, IgG4UpperLimit= 138 },
-                new IgManualCilvSeconder { AgeInMonthsLowerLimit= 97, AgeInMonthsUpperLimit= 120, IgG1LowerLimit= 456, IgG1UpperLimit= 938, IgG2LowerLimit= 163, IgG2UpperLimit= 513, IgG3LowerLimit= 26, IgG3GUpperLimit= 113, IgG4LowerLimit= 1, IgG4UpperLimit= 95 },
-                new IgManualCilvSeconder { AgeInMonthsLowerLimit= 121, AgeInMonthsUpperLimit= 144, IgG1LowerLimit= 456, IgG1UpperLimit= 952, IgG2LowerLimit= 147, IgG2UpperLimit= 493, IgG3LowerLimit= 12, IgG3GUpperLimit= 179, IgG4LowerLimit= 1, IgG4UpperLimit= 153 },
-                new IgManualCilvSeconder { AgeInMonthsLowerLimit= 145, AgeInMonthsUpperLimit= 168, IgG1LowerLimit= 347, IgG1UpperLimit= 993, IgG2LowerLimit= 140, IgG2UpperLimit= 440, IgG3LowerLimit= 23, IgG3GUpperLimit= 117, IgG4LowerLimit= 1, IgG4UpperLimit= 143 },
-                new IgManualCilvSeconder { AgeInMonthsLowerLimit= 169, AgeInMonthsUpperLimit= 216, IgG1LowerLimit= 422, IgG1UpperLimit= 1292, IgG2LowerLimit= 117, IgG2UpperLimit= 747, IgG3LowerLimit= 41, IgG3GUpperLimit= 129, IgG4LowerLimit= 10, IgG4UpperLimit= 67 }
+                new IgManualCilvSeconder { AgeInMonthsLowerLimit= -9, AgeInMonthsUpperLimit= 0, IgG1LowerLimit= 435, IgG1UpperLimit= 1084, IgG2LowerLimit= 143, IgG2UpperLimit= 453, IgG3LowerLimit= 27, IgG3UpperLimit= 146, IgG4LowerLimit= 1, IgG4UpperLimit= 47 },
+                new IgManualCilvSeconder { AgeInMonthsLowerLimit= 1, AgeInMonthsUpperLimit= 3, IgG1LowerLimit= 218, IgG1UpperLimit= 496, IgG2LowerLimit= 40, IgG2UpperLimit= 167, IgG3LowerLimit= 4, IgG3UpperLimit= 23, IgG4LowerLimit= 1, IgG4UpperLimit= 120 },
+                new IgManualCilvSeconder { AgeInMonthsLowerLimit= 4, AgeInMonthsUpperLimit= 6, IgG1LowerLimit= 143, IgG1UpperLimit= 394, IgG2LowerLimit= 23, IgG2UpperLimit= 147, IgG3LowerLimit= 4, IgG3UpperLimit= 100, IgG4LowerLimit= 1, IgG4UpperLimit= 120 },
+                new IgManualCilvSeconder { AgeInMonthsLowerLimit= 7, AgeInMonthsUpperLimit= 9, IgG1LowerLimit= 190, IgG1UpperLimit= 388, IgG2LowerLimit= 37, IgG2UpperLimit= 60, IgG3LowerLimit= 12, IgG3UpperLimit= 62, IgG4LowerLimit= 1, IgG4UpperLimit= 120 },
+                new IgManualCilvSeconder { AgeInMonthsLowerLimit= 10, AgeInMonthsUpperLimit= 24, IgG1LowerLimit= 286, IgG1UpperLimit= 680, IgG2LowerLimit= 30, IgG2UpperLimit= 327, IgG3LowerLimit= 13, IgG3UpperLimit= 82, IgG4LowerLimit= 1, IgG4UpperLimit= 120 },
+                new IgManualCilvSeconder { AgeInMonthsLowerLimit= 25, AgeInMonthsUpperLimit= 48, IgG1LowerLimit= 381, IgG1UpperLimit= 884, IgG2LowerLimit= 70, IgG2UpperLimit= 443, IgG3LowerLimit= 17, IgG3UpperLimit= 90, IgG4LowerLimit= 1, IgG4UpperLimit= 120 },
+                new IgManualCilvSeconder { AgeInMonthsLowerLimit= 49, AgeInMonthsUpperLimit= 72, IgG1LowerLimit= 292, IgG1UpperLimit= 816, IgG2LowerLimit= 83, IgG2UpperLimit= 513, IgG3LowerLimit= 8, IgG3UpperLimit= 111, IgG4LowerLimit= 2, IgG4UpperLimit= 112 },
+                new IgManualCilvSeconder { AgeInMonthsLowerLimit= 73, AgeInMonthsUpperLimit= 96, IgG1LowerLimit= 422, IgG1UpperLimit= 802, IgG2LowerLimit= 113, IgG2UpperLimit= 480, IgG3LowerLimit= 15, IgG3UpperLimit= 133, IgG4LowerLimit= 1, IgG4UpperLimit= 138 },
+                new IgManualCilvSeconder { AgeInMonthsLowerLimit= 97, AgeInMonthsUpperLimit= 120, IgG1LowerLimit= 456, IgG1UpperLimit= 938, IgG2LowerLimit= 163, IgG2UpperLimit= 513, IgG3LowerLimit= 26, IgG3UpperLimit= 113, IgG4LowerLimit= 1, IgG4UpperLimit= 95 },
+                new IgManualCilvSeconder { AgeInMonthsLowerLimit= 121, AgeInMonthsUpperLimit= 144, IgG1LowerLimit= 456, IgG1UpperLimit= 952, IgG2LowerLimit= 147, IgG2UpperLimit= 493, IgG3LowerLimit= 12, IgG3UpperLimit= 179, IgG4LowerLimit= 1, IgG4UpperLimit= 153 },
+                new IgManualCilvSeconder { AgeInMonthsLowerLimit= 145, AgeInMonthsUpperLimit= 168, IgG1LowerLimit= 347, IgG1UpperLimit= 993, IgG2LowerLimit= 140, IgG2UpperLimit= 440, IgG3LowerLimit= 23, IgG3UpperLimit= 117, IgG4LowerLimit= 1, IgG4UpperLimit= 143 },
+                new IgManualCilvSeconder { AgeInMonthsLowerLimit= 169, AgeInMonthsUpperLimit= 216, IgG1LowerLimit= 422, IgG1UpperLimit= 1292, IgG2LowerLimit= 117, IgG2UpperLimit= 747, IgG3LowerLimit= 41, IgG3UpperLimit= 129, IgG4LowerLimit= 10, IgG4UpperLimit= 67 }
             };
             await _context.IgsManualCilvSeconder.AddRangeAsync(manual);
             await _context.SaveChangesAsync();
@@ -345,20 +358,20 @@ namespace E_Lab_Backend.Data
                 new IgManualOs { AgeInMonthsLowerLimit = 25, AgeInMonthsUpperLimit = 36, Gender = GenderEnum.Male,  IgType = IgTypeEnum.IgG, ArithmeticMean = 908.8f, AMStandardDeviation = 185.3f, MinValue = 726f, MaxValue = 1320f, PValue = 0.087f },
                 new IgManualOs { AgeInMonthsLowerLimit = 25, AgeInMonthsUpperLimit = 36, Gender = GenderEnum.Female,  IgType = IgTypeEnum.IgG, ArithmeticMean = 760.7f, AMStandardDeviation = 180.39f, MinValue = 437f, MaxValue = 1130f, PValue = 0.087f },
 
-                new IgManualOs { AgeInMonthsLowerLimit = 48, AgeInMonthsUpperLimit = 60, Gender = GenderEnum.Male,  IgType = IgTypeEnum.IgG, ArithmeticMean = 1175f, AMStandardDeviation = 159.98f, MinValue = 849f, MaxValue = 1400f, PValue = 0.001f },
-                new IgManualOs { AgeInMonthsLowerLimit = 48, AgeInMonthsUpperLimit = 60, Gender = GenderEnum.Female,  IgType = IgTypeEnum.IgG, ArithmeticMean = 813.8f, AMStandardDeviation = 142.09f, MinValue = 524f, MaxValue = 1020f, PValue = 0.001f },
+                new IgManualOs { AgeInMonthsLowerLimit = 37, AgeInMonthsUpperLimit = 60, Gender = GenderEnum.Male,  IgType = IgTypeEnum.IgG, ArithmeticMean = 1175f, AMStandardDeviation = 159.98f, MinValue = 849f, MaxValue = 1400f, PValue = 0.001f },
+                new IgManualOs { AgeInMonthsLowerLimit = 37, AgeInMonthsUpperLimit = 60, Gender = GenderEnum.Female,  IgType = IgTypeEnum.IgG, ArithmeticMean = 813.8f, AMStandardDeviation = 142.09f, MinValue = 524f, MaxValue = 1020f, PValue = 0.001f },
 
-                new IgManualOs { AgeInMonthsLowerLimit = 72, AgeInMonthsUpperLimit = 96, Gender = GenderEnum.Male,  IgType = IgTypeEnum.IgG, ArithmeticMean = 1279.4f, AMStandardDeviation = 234.59f, MinValue = 884f, MaxValue = 1600f, PValue = 0.017f },
-                new IgManualOs { AgeInMonthsLowerLimit = 72, AgeInMonthsUpperLimit = 96, Gender = GenderEnum.Female,  IgType = IgTypeEnum.IgG, ArithmeticMean = 1046.1f, AMStandardDeviation = 155.95f, MinValue = 858f, MaxValue = 1350f, PValue = 0.017f },
+                new IgManualOs { AgeInMonthsLowerLimit = 61, AgeInMonthsUpperLimit = 96, Gender = GenderEnum.Male,  IgType = IgTypeEnum.IgG, ArithmeticMean = 1279.4f, AMStandardDeviation = 234.59f, MinValue = 884f, MaxValue = 1600f, PValue = 0.017f },
+                new IgManualOs { AgeInMonthsLowerLimit = 61, AgeInMonthsUpperLimit = 96, Gender = GenderEnum.Female,  IgType = IgTypeEnum.IgG, ArithmeticMean = 1046.1f, AMStandardDeviation = 155.95f, MinValue = 858f, MaxValue = 1350f, PValue = 0.017f },
 
-                new IgManualOs { AgeInMonthsLowerLimit = 108, AgeInMonthsUpperLimit = 132, Gender = GenderEnum.Male,  IgType = IgTypeEnum.IgG, ArithmeticMean = 1219.7f, AMStandardDeviation = 216.05f, MinValue = 763f, MaxValue = 1490f, PValue = 0.458f },
-                new IgManualOs { AgeInMonthsLowerLimit = 108, AgeInMonthsUpperLimit = 132, Gender = GenderEnum.Female,  IgType = IgTypeEnum.IgG, ArithmeticMean = 1134.5f, AMStandardDeviation = 281.72f, MinValue = 645f, MaxValue = 1520f, PValue = 0.458f },
+                new IgManualOs { AgeInMonthsLowerLimit = 97, AgeInMonthsUpperLimit = 132, Gender = GenderEnum.Male,  IgType = IgTypeEnum.IgG, ArithmeticMean = 1219.7f, AMStandardDeviation = 216.05f, MinValue = 763f, MaxValue = 1490f, PValue = 0.458f },
+                new IgManualOs { AgeInMonthsLowerLimit = 97, AgeInMonthsUpperLimit = 132, Gender = GenderEnum.Female,  IgType = IgTypeEnum.IgG, ArithmeticMean = 1134.5f, AMStandardDeviation = 281.72f, MinValue = 645f, MaxValue = 1520f, PValue = 0.458f },
 
-                new IgManualOs { AgeInMonthsLowerLimit = 144, AgeInMonthsUpperLimit = 192, Gender = GenderEnum.Male,  IgType = IgTypeEnum.IgG, ArithmeticMean = 1278.7f, AMStandardDeviation = 205.3f, MinValue = 924f, MaxValue = 1620f, PValue = 0.216f },
-                new IgManualOs { AgeInMonthsLowerLimit = 144, AgeInMonthsUpperLimit = 192, Gender = GenderEnum.Female,  IgType = IgTypeEnum.IgG, ArithmeticMean = 1149.2f, AMStandardDeviation = 244.65f, MinValue = 877f, MaxValue = 1560f, PValue = 0.216f },
+                new IgManualOs { AgeInMonthsLowerLimit = 133, AgeInMonthsUpperLimit = 192, Gender = GenderEnum.Male,  IgType = IgTypeEnum.IgG, ArithmeticMean = 1278.7f, AMStandardDeviation = 205.3f, MinValue = 924f, MaxValue = 1620f, PValue = 0.216f },
+                new IgManualOs { AgeInMonthsLowerLimit = 133, AgeInMonthsUpperLimit = 192, Gender = GenderEnum.Female,  IgType = IgTypeEnum.IgG, ArithmeticMean = 1149.2f, AMStandardDeviation = 244.65f, MinValue = 877f, MaxValue = 1560f, PValue = 0.216f },
 
-                new IgManualOs { AgeInMonthsLowerLimit = 204, AgeInMonthsUpperLimit = 216, Gender = GenderEnum.Male,  IgType = IgTypeEnum.IgG, ArithmeticMean = 1413.3f, AMStandardDeviation = 355.14f, MinValue = 863f, MaxValue = 1830f, PValue = 0.587f },
-                new IgManualOs { AgeInMonthsLowerLimit = 204, AgeInMonthsUpperLimit = 216, Gender = GenderEnum.Female,  IgType = IgTypeEnum.IgG, ArithmeticMean = 1330.6f, AMStandardDeviation = 312.43f, MinValue = 758f, MaxValue = 1760f, PValue = 0.587f }
+                new IgManualOs { AgeInMonthsLowerLimit = 193, AgeInMonthsUpperLimit = 216, Gender = GenderEnum.Male,  IgType = IgTypeEnum.IgG, ArithmeticMean = 1413.3f, AMStandardDeviation = 355.14f, MinValue = 863f, MaxValue = 1830f, PValue = 0.587f },
+                new IgManualOs { AgeInMonthsLowerLimit = 193, AgeInMonthsUpperLimit = 216, Gender = GenderEnum.Female,  IgType = IgTypeEnum.IgG, ArithmeticMean = 1330.6f, AMStandardDeviation = 312.43f, MinValue = 758f, MaxValue = 1760f, PValue = 0.587f }
             };
 
             var manualIgA = new List<IgManualOs>
@@ -378,20 +391,20 @@ namespace E_Lab_Backend.Data
                 new IgManualOs { AgeInMonthsLowerLimit = 25, AgeInMonthsUpperLimit = 36, Gender = GenderEnum.Male, IgType = IgTypeEnum.IgA, ArithmeticMean = 56.5f, AMStandardDeviation = 10.19f, MinValue = 43f, MaxValue = 71f, PValue = 0.536f },
                 new IgManualOs { AgeInMonthsLowerLimit = 25, AgeInMonthsUpperLimit = 36, Gender = GenderEnum.Female, IgType = IgTypeEnum.IgA, ArithmeticMean = 51.9f, AMStandardDeviation = 20.68f, MinValue = 24f, MaxValue = 84f, PValue = 0.536f },
 
-                new IgManualOs { AgeInMonthsLowerLimit = 48, AgeInMonthsUpperLimit = 60, Gender = GenderEnum.Male, IgType = IgTypeEnum.IgA, ArithmeticMean = 104.1f, AMStandardDeviation = 19.34f, MinValue = 79f, MaxValue = 135f, PValue = 0.033f },
-                new IgManualOs { AgeInMonthsLowerLimit = 48, AgeInMonthsUpperLimit = 60, Gender = GenderEnum.Female, IgType = IgTypeEnum.IgA, ArithmeticMean = 84.6f, AMStandardDeviation = 18.37f, MinValue = 55f, MaxValue = 106f, PValue = 0.033f },
+                new IgManualOs { AgeInMonthsLowerLimit = 37, AgeInMonthsUpperLimit = 60, Gender = GenderEnum.Male, IgType = IgTypeEnum.IgA, ArithmeticMean = 104.1f, AMStandardDeviation = 19.34f, MinValue = 79f, MaxValue = 135f, PValue = 0.033f },
+                new IgManualOs { AgeInMonthsLowerLimit = 37, AgeInMonthsUpperLimit = 60, Gender = GenderEnum.Female, IgType = IgTypeEnum.IgA, ArithmeticMean = 84.6f, AMStandardDeviation = 18.37f, MinValue = 55f, MaxValue = 106f, PValue = 0.033f },
 
-                new IgManualOs { AgeInMonthsLowerLimit = 72, AgeInMonthsUpperLimit = 96, Gender = GenderEnum.Male, IgType = IgTypeEnum.IgA, ArithmeticMean = 148.4f, AMStandardDeviation = 57.34f, MinValue = 82f, MaxValue = 264f, PValue = 0.087f },
-                new IgManualOs { AgeInMonthsLowerLimit = 72, AgeInMonthsUpperLimit = 96, Gender = GenderEnum.Female, IgType = IgTypeEnum.IgA, ArithmeticMean = 112.1f, AMStandardDeviation = 26.94f, MinValue = 81f, MaxValue = 150f, PValue = 0.087f },
+                new IgManualOs { AgeInMonthsLowerLimit = 61, AgeInMonthsUpperLimit = 96, Gender = GenderEnum.Male, IgType = IgTypeEnum.IgA, ArithmeticMean = 148.4f, AMStandardDeviation = 57.34f, MinValue = 82f, MaxValue = 264f, PValue = 0.087f },
+                new IgManualOs { AgeInMonthsLowerLimit = 61, AgeInMonthsUpperLimit = 96, Gender = GenderEnum.Female, IgType = IgTypeEnum.IgA, ArithmeticMean = 112.1f, AMStandardDeviation = 26.94f, MinValue = 81f, MaxValue = 150f, PValue = 0.087f },
 
-                new IgManualOs { AgeInMonthsLowerLimit = 108, AgeInMonthsUpperLimit = 132, Gender = GenderEnum.Male, IgType = IgTypeEnum.IgA, ArithmeticMean = 176.7f, AMStandardDeviation = 87.17f, MinValue = 82f, MaxValue = 334f, PValue = 0.316f },
-                new IgManualOs { AgeInMonthsLowerLimit = 108, AgeInMonthsUpperLimit = 132, Gender = GenderEnum.Female, IgType = IgTypeEnum.IgA, ArithmeticMean = 144.2f, AMStandardDeviation = 48.22f, MinValue = 78f, MaxValue = 233f, PValue = 0.316f },
+                new IgManualOs { AgeInMonthsLowerLimit = 97, AgeInMonthsUpperLimit = 132, Gender = GenderEnum.Male, IgType = IgTypeEnum.IgA, ArithmeticMean = 176.7f, AMStandardDeviation = 87.17f, MinValue = 82f, MaxValue = 334f, PValue = 0.316f },
+                new IgManualOs { AgeInMonthsLowerLimit = 97, AgeInMonthsUpperLimit = 132, Gender = GenderEnum.Female, IgType = IgTypeEnum.IgA, ArithmeticMean = 144.2f, AMStandardDeviation = 48.22f, MinValue = 78f, MaxValue = 233f, PValue = 0.316f },
 
-                new IgManualOs { AgeInMonthsLowerLimit = 144, AgeInMonthsUpperLimit = 192, Gender = GenderEnum.Male, IgType = IgTypeEnum.IgA, ArithmeticMean = 163.7f, AMStandardDeviation = 55.77f, MinValue = 88f, MaxValue = 234f, PValue = 0.993f },
-                new IgManualOs { AgeInMonthsLowerLimit = 144, AgeInMonthsUpperLimit = 192, Gender = GenderEnum.Female, IgType = IgTypeEnum.IgA, ArithmeticMean = 163.5f, AMStandardDeviation = 45.61f, MinValue = 87f, MaxValue = 230f, PValue = 0.993f },
+                new IgManualOs { AgeInMonthsLowerLimit = 133, AgeInMonthsUpperLimit = 192, Gender = GenderEnum.Male, IgType = IgTypeEnum.IgA, ArithmeticMean = 163.7f, AMStandardDeviation = 55.77f, MinValue = 88f, MaxValue = 234f, PValue = 0.993f },
+                new IgManualOs { AgeInMonthsLowerLimit = 133, AgeInMonthsUpperLimit = 192, Gender = GenderEnum.Female, IgType = IgTypeEnum.IgA, ArithmeticMean = 163.5f, AMStandardDeviation = 45.61f, MinValue = 87f, MaxValue = 230f, PValue = 0.993f },
 
-                new IgManualOs { AgeInMonthsLowerLimit = 204, AgeInMonthsUpperLimit = 216, Gender = GenderEnum.Male, IgType = IgTypeEnum.IgA, ArithmeticMean = 192.9f, AMStandardDeviation = 95.77f, MinValue = 6f, MaxValue = 359f, PValue = 0.489f },
-                new IgManualOs { AgeInMonthsLowerLimit = 204, AgeInMonthsUpperLimit = 216, Gender = GenderEnum.Female, IgType = IgTypeEnum.IgA, ArithmeticMean = 219.7f, AMStandardDeviation = 72.48f, MinValue = 111f, MaxValue = 350f, PValue = 0.489f }
+                new IgManualOs { AgeInMonthsLowerLimit = 193, AgeInMonthsUpperLimit = 216, Gender = GenderEnum.Male, IgType = IgTypeEnum.IgA, ArithmeticMean = 192.9f, AMStandardDeviation = 95.77f, MinValue = 6f, MaxValue = 359f, PValue = 0.489f },
+                new IgManualOs { AgeInMonthsLowerLimit = 193, AgeInMonthsUpperLimit = 216, Gender = GenderEnum.Female, IgType = IgTypeEnum.IgA, ArithmeticMean = 219.7f, AMStandardDeviation = 72.48f, MinValue = 111f, MaxValue = 350f, PValue = 0.489f }
             };
             var manualIgM = new List<IgManualOs>
             {
@@ -416,24 +429,24 @@ namespace E_Lab_Backend.Data
                 new IgManualOs { AgeInMonthsLowerLimit = 25, AgeInMonthsUpperLimit = 36, Gender = GenderEnum.Female, IgType = IgTypeEnum.IgM, ArithmeticMean = 95.9f, AMStandardDeviation = 26.86f, MinValue = 47f, MaxValue = 137f, PValue = 0.441f },
 
                 // 4-5 Yaş
-                new IgManualOs { AgeInMonthsLowerLimit = 48, AgeInMonthsUpperLimit = 60, Gender = GenderEnum.Male, IgType = IgTypeEnum.IgM, ArithmeticMean = 119.7f, AMStandardDeviation = 33.79f, MinValue = 65f, MaxValue = 179f, PValue = 0.872f },
-                new IgManualOs { AgeInMonthsLowerLimit = 48, AgeInMonthsUpperLimit = 60, Gender = GenderEnum.Female, IgType = IgTypeEnum.IgM, ArithmeticMean = 122.5f, AMStandardDeviation = 42.38f, MinValue = 68f, MaxValue = 205f, PValue = 0.872f },
+                new IgManualOs { AgeInMonthsLowerLimit = 37, AgeInMonthsUpperLimit = 60, Gender = GenderEnum.Male, IgType = IgTypeEnum.IgM, ArithmeticMean = 119.7f, AMStandardDeviation = 33.79f, MinValue = 65f, MaxValue = 179f, PValue = 0.872f },
+                new IgManualOs { AgeInMonthsLowerLimit = 37, AgeInMonthsUpperLimit = 60, Gender = GenderEnum.Female, IgType = IgTypeEnum.IgM, ArithmeticMean = 122.5f, AMStandardDeviation = 42.38f, MinValue = 68f, MaxValue = 205f, PValue = 0.872f },
 
                 // 6-8 Yaş
-                new IgManualOs { AgeInMonthsLowerLimit = 72, AgeInMonthsUpperLimit = 96, Gender = GenderEnum.Male, IgType = IgTypeEnum.IgM, ArithmeticMean = 121.9f, AMStandardDeviation = 44.24f, MinValue = 47f, MaxValue = 198f, PValue = 0.683f },
-                new IgManualOs { AgeInMonthsLowerLimit = 72, AgeInMonthsUpperLimit = 96, Gender = GenderEnum.Female, IgType = IgTypeEnum.IgM, ArithmeticMean = 114.4f, AMStandardDeviation = 36.1f, MinValue = 53f, MaxValue = 175f, PValue = 0.683f },
+                new IgManualOs { AgeInMonthsLowerLimit = 61, AgeInMonthsUpperLimit = 96, Gender = GenderEnum.Male, IgType = IgTypeEnum.IgM, ArithmeticMean = 121.9f, AMStandardDeviation = 44.24f, MinValue = 47f, MaxValue = 198f, PValue = 0.683f },
+                new IgManualOs { AgeInMonthsLowerLimit = 61, AgeInMonthsUpperLimit = 96, Gender = GenderEnum.Female, IgType = IgTypeEnum.IgM, ArithmeticMean = 114.4f, AMStandardDeviation = 36.1f, MinValue = 53f, MaxValue = 175f, PValue = 0.683f },
 
                 // 9-11 Yaş
-                new IgManualOs { AgeInMonthsLowerLimit = 108, AgeInMonthsUpperLimit = 132, Gender = GenderEnum.Male, IgType = IgTypeEnum.IgM, ArithmeticMean = 107.8f, AMStandardDeviation = 42.15f, MinValue = 54f, MaxValue = 163f, PValue = 0.508f },
-                new IgManualOs { AgeInMonthsLowerLimit = 108, AgeInMonthsUpperLimit = 132, Gender = GenderEnum.Female, IgType = IgTypeEnum.IgM, ArithmeticMean = 96.6f, AMStandardDeviation = 31.3f, MinValue = 38f, MaxValue = 150f, PValue = 0.508f },
+                new IgManualOs { AgeInMonthsLowerLimit = 97, AgeInMonthsUpperLimit = 132, Gender = GenderEnum.Male, IgType = IgTypeEnum.IgM, ArithmeticMean = 107.8f, AMStandardDeviation = 42.15f, MinValue = 54f, MaxValue = 163f, PValue = 0.508f },
+                new IgManualOs { AgeInMonthsLowerLimit = 97, AgeInMonthsUpperLimit = 132, Gender = GenderEnum.Female, IgType = IgTypeEnum.IgM, ArithmeticMean = 96.6f, AMStandardDeviation = 31.3f, MinValue = 38f, MaxValue = 150f, PValue = 0.508f },
 
                 // 12-16 Yaş
-                new IgManualOs { AgeInMonthsLowerLimit = 144, AgeInMonthsUpperLimit = 192, Gender = GenderEnum.Male, IgType = IgTypeEnum.IgM, ArithmeticMean = 124.4f, AMStandardDeviation = 49.3f, MinValue = 47f, MaxValue = 180f, PValue = 0.141f },
-                new IgManualOs { AgeInMonthsLowerLimit = 144, AgeInMonthsUpperLimit = 192, Gender = GenderEnum.Female, IgType = IgTypeEnum.IgM, ArithmeticMean = 162.8f, AMStandardDeviation = 61.48f, MinValue = 57f, MaxValue = 285f, PValue = 0.141f },
+                new IgManualOs { AgeInMonthsLowerLimit = 133, AgeInMonthsUpperLimit = 192, Gender = GenderEnum.Male, IgType = IgTypeEnum.IgM, ArithmeticMean = 124.4f, AMStandardDeviation = 49.3f, MinValue = 47f, MaxValue = 180f, PValue = 0.141f },
+                new IgManualOs { AgeInMonthsLowerLimit = 133, AgeInMonthsUpperLimit = 192, Gender = GenderEnum.Female, IgType = IgTypeEnum.IgM, ArithmeticMean = 162.8f, AMStandardDeviation = 61.48f, MinValue = 57f, MaxValue = 285f, PValue = 0.141f },
 
                 // 17-18 Yaş
-                new IgManualOs { AgeInMonthsLowerLimit = 204, AgeInMonthsUpperLimit = 216, Gender = GenderEnum.Male, IgType = IgTypeEnum.IgM, ArithmeticMean = 138.3f, AMStandardDeviation = 58.63f, MinValue = 64f, MaxValue = 256f, PValue = 0.397f },
-                new IgManualOs { AgeInMonthsLowerLimit = 204, AgeInMonthsUpperLimit = 216, Gender = GenderEnum.Female, IgType = IgTypeEnum.IgM, ArithmeticMean = 118.7f, AMStandardDeviation = 40.86f, MinValue = 61f, MaxValue = 180f, PValue = 0.397f }
+                new IgManualOs { AgeInMonthsLowerLimit = 193, AgeInMonthsUpperLimit = 216, Gender = GenderEnum.Male, IgType = IgTypeEnum.IgM, ArithmeticMean = 138.3f, AMStandardDeviation = 58.63f, MinValue = 64f, MaxValue = 256f, PValue = 0.397f },
+                new IgManualOs { AgeInMonthsLowerLimit = 193, AgeInMonthsUpperLimit = 216, Gender = GenderEnum.Female, IgType = IgTypeEnum.IgM, ArithmeticMean = 118.7f, AMStandardDeviation = 40.86f, MinValue = 61f, MaxValue = 180f, PValue = 0.397f }
             };
 
             using var transaction = await _context.Database.BeginTransactionAsync();

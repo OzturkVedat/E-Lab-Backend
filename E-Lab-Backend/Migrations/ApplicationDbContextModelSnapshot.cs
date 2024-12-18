@@ -51,10 +51,10 @@ namespace E_Lab_Backend.Migrations
                     b.Property<float>("IgG2UpperLimit")
                         .HasColumnType("real");
 
-                    b.Property<float>("IgG3GUpperLimit")
+                    b.Property<float>("IgG3LowerLimit")
                         .HasColumnType("real");
 
-                    b.Property<float>("IgG3LowerLimit")
+                    b.Property<float>("IgG3UpperLimit")
                         .HasColumnType("real");
 
                     b.Property<float>("IgG4LowerLimit")
@@ -137,10 +137,10 @@ namespace E_Lab_Backend.Migrations
                     b.Property<float>("IgG2UpperLimit")
                         .HasColumnType("real");
 
-                    b.Property<float>("IgG3GUpperLimit")
+                    b.Property<float>("IgG3LowerLimit")
                         .HasColumnType("real");
 
-                    b.Property<float>("IgG3LowerLimit")
+                    b.Property<float>("IgG3UpperLimit")
                         .HasColumnType("real");
 
                     b.Property<float>("IgG4LowerLimit")

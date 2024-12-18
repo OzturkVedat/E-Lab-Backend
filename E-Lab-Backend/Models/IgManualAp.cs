@@ -16,7 +16,7 @@
         public float IgG2LowerLimit { get; set; }
         public float IgG2UpperLimit { get; set; }
         public float IgG3LowerLimit { get; set; }
-        public float IgG3GUpperLimit { get; set; }
+        public float IgG3UpperLimit { get; set; }
         public float IgG4LowerLimit { get; set; }
         public float IgG4UpperLimit { get; set; }
     }

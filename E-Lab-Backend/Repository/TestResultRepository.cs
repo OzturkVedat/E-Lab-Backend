@@ -28,6 +28,7 @@ namespace E_Lab_Backend.Repository
             {
                 var result = await _context.TestResults
                     .AsNoTracking()
+                    .Include(r => r.Patient)
                     .Where(r => r.Id == resultId)
                     .ProjectTo<TestResultDetails>(_mapper.ConfigurationProvider)
                     .FirstOrDefaultAsync();
@@ -35,15 +36,37 @@ namespace E_Lab_Backend.Repository
                 if (result == null)
                     return new FailureResult("Tahlil bulunamadi.");
 
-                var nonNulls = ExtractNonNullFloatValues(result);
-
-                var rangeResults = await CheckManuals(nonNulls, result.AgeInMonths);
-                return new SuccessDataResult<List<Dictionary<IgTypeEnum, (string, float)>>>(rangeResults);
+                var manualResults = await CheckManuals(result);
+                return new SuccessDataResult<TestResultsFromManuals>(manualResults);
             }
-            catch (SqlException ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Error fetching test result.");
                 return new FailureResult("Tahlil sonucu sorgusunda bir hata olustu.");
+            }
+        }
+
+        public async Task<ResultModel> GetPreviousTestResults(string resultId)
+        {
+            try
+            {
+                var currentResult = await _context.TestResults.FindAsync(resultId);
+                if (currentResult == null)
+                    return new FailureResult("Tahlil bulunamadi.");
+
+                var previousResults = await _context.TestResults
+                    .Where(tr => tr.PatientId == currentResult.PatientId && tr.Id != resultId)
+                    .OrderByDescending(tr => tr.ExpertApproveTime)
+                    .Take(2)
+                    .ProjectTo<TestResultDto>(_mapper.ConfigurationProvider)
+                    .ToListAsync();
+                return new SuccessDataResult<List<TestResultDto>>(previousResults);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching previous test results.");
+                return new FailureResult("Gecmis tahlil sonucu sorgusu/karsilastirmasinda bir hata olustu.");
             }
         }
 
@@ -68,6 +91,25 @@ namespace E_Lab_Backend.Repository
         }
 
 
+        public async Task<ResultModel> GetAllTestResults()
+        {
+            try
+            {
+                var results = await _context.TestResults
+                .AsNoTracking()
+                .OrderByDescending(r => r.ExpertApproveTime)
+                .ProjectTo<TestResultDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+                return new SuccessDataResult<List<TestResultDto>>(results);
+            }
+            catch (SqlException ex)
+            {
+                _logger.LogError(ex, "Error fetching all test results.");
+                return new FailureResult("Tahlil sonuclari sorgusunda bir hata olustu.");
+            }
+        }
+
         public async Task<ResultModel> AddNewTestResult(NewTestResultDto dto)
         {
             try
@@ -89,104 +131,271 @@ namespace E_Lab_Backend.Repository
             }
         }
 
-        private Dictionary<IgTypeEnum, float> ExtractNonNullFloatValues(TestResultDetails testResult)
+        private async Task<TestResultsFromManuals> CheckManuals(TestResultDetails details)
         {
-            return testResult.GetType()
-                .GetProperties()
-                .Where(p => p.PropertyType == typeof(float?))
-                .Select(p => new
-                {
-                    Key = GetIgTypeEnumFromPropertyName(p.Name),
-                    Value = (float?)p.GetValue(testResult)
-                })
-                .Where(x => x.Value.HasValue)   // keep only non-nulls
-                .ToDictionary(x => x.Key, x => x.Value.Value);
-        }
-        private IgTypeEnum GetIgTypeEnumFromPropertyName(string propertyName)
-        {
-            return propertyName switch
+            var ageInMonths = details.AgeInMonths;
+            var gender = details.Gender;
+            var igManualAp = await _context.IgsManualAp
+                .Where(ig => ageInMonths >= ig.AgeInMonthsLowerLimit && ageInMonths <= ig.AgeInMonthsUpperLimit)
+                .FirstOrDefaultAsync();
+            var igResultAp = new IgResultsDto { ReferencedManualName = "ManualAp" };
+
+            var igManualCilvPrimer = await _context.IgsManualCilvPrimer
+                .Where(ig => ageInMonths >= ig.AgeInMonthsLowerLimit && ageInMonths <= ig.AgeInMonthsUpperLimit)
+                .FirstOrDefaultAsync();
+            var igManualCilvSeconder = await _context.IgsManualCilvSeconder
+                .Where(ig => ageInMonths >= ig.AgeInMonthsLowerLimit && ageInMonths <= ig.AgeInMonthsUpperLimit)
+                .FirstOrDefaultAsync();
+            var igResultCilv = new IgResultsDto { ReferencedManualName = "ManualCilv" };
+
+            var igManualOs = await _context.IgsManualOs
+                .Where(ig => ageInMonths >= ig.AgeInMonthsLowerLimit && ageInMonths <= ig.AgeInMonthsUpperLimit)
+                .ToListAsync();
+            var igResultOs = new ManualOsResult();
+            var igRangesOsList = new List<IgOsRangesResult>();
+
+            var igManualTjp = await _context.IgsManualTjp
+               .Where(ig => ageInMonths >= ig.AgeInMonthsLowerLimit && ageInMonths <= ig.AgeInMonthsUpperLimit)
+               .ToListAsync();
+            var igResultTjp = new ManualTjpResult();
+            var igRangesTjpList = new List<IgTjpRangesResult>();
+
+            var igManualTubitak = await _context.IgsManualTubitak
+               .Where(ig => ageInMonths >= ig.AgeInMonthsLowerLimit && ageInMonths <= ig.AgeInMonthsUpperLimit)
+               .ToListAsync();
+            var igResultTubitak = new ManualTubitakResult();
+            var igRangesTubitakList = new List<IgTubitakRangesResult>();
+
+            if (details.IgG != null)
             {
-                "IgA" => IgTypeEnum.IgA,
-                "IgM" => IgTypeEnum.IgM,
-                "IgG" => IgTypeEnum.IgG,
-                "IgG1" => IgTypeEnum.IgG1,
-                "IgG2" => IgTypeEnum.IgG2,
-                "IgG3" => IgTypeEnum.IgG3,
-                "IgG4" => IgTypeEnum.IgG4,
-                _ => throw new ArgumentException($"Unknown property name: {propertyName}")
-            };
-        }
+                igResultAp.IgGResult = GetRangeResult(details.IgG, igManualAp.IgGLowerLimit, igManualAp.IgGUpperLimit);
+                igResultCilv.IgGResult = GetRangeResult(details.IgG, igManualCilvPrimer.IgGLowerLimit, igManualCilvPrimer.IgGUpperLimit);
 
-        private async Task<List<Dictionary<IgTypeEnum, (string, float)>>> CheckManuals(Dictionary<IgTypeEnum, float> nonNullValues, int ageInMonths)
-        {
-            var igManualApTask = _context.IgsManualAp
-                .Where(ig => ageInMonths >= ig.AgeInMonthsLowerLimit && ageInMonths <= ig.AgeInMonthsUpperLimit)
-                .FirstOrDefaultAsync();
-
-            var igManualCilvPrimerTask = _context.IgsManualCilvPrimer
-                .Where(ig => ageInMonths >= ig.AgeInMonthsLowerLimit && ageInMonths <= ig.AgeInMonthsUpperLimit)
-                .FirstOrDefaultAsync();
-
-            var igManualCilvSeconderTask = _context.IgsManualCilvSeconder
-                .Where(ig => ageInMonths >= ig.AgeInMonthsLowerLimit && ageInMonths <= ig.AgeInMonthsUpperLimit)
-                .FirstOrDefaultAsync();
-
-            // parallel async
-            await Task.WhenAll(igManualApTask, igManualCilvPrimerTask, igManualCilvSeconderTask);
-
-            var igManualAp = igManualApTask.Result;
-            var igManualCilvPrimer = igManualCilvPrimerTask.Result;
-            var igManualCilvSeconder = igManualCilvSeconderTask.Result;
-
-            var igManualApResults = new Dictionary<IgTypeEnum, (string, float)>();
-            var igManualCilvResults = new Dictionary<IgTypeEnum, (string, float)>();
-
-            foreach (var (key, value) in nonNullValues)
-            {
-                if (igManualAp != null)
+                var iggOsRange = igManualOs.Where(ig => ig.IgType == IgTypeEnum.IgG).FirstOrDefault();
+                IgOsRangesResult iggOsResult = new IgOsRangesResult
                 {
-                    string rangeResult = key switch
-                    {
-                        IgTypeEnum.IgA => GetRangeResult(value, igManualAp.IgALowerLimit, igManualAp.IgAUpperLimit),
-                        IgTypeEnum.IgM => GetRangeResult(value, igManualAp.IgMLowerLimit, igManualAp.IgMUpperLimit),
-                        IgTypeEnum.IgG => GetRangeResult(value, igManualAp.IgGLowerLimit, igManualAp.IgGUpperLimit),
-                        IgTypeEnum.IgG1 => GetRangeResult(value, igManualAp.IgG1LowerLimit, igManualAp.IgG1UpperLimit),
-                        IgTypeEnum.IgG2 => GetRangeResult(value, igManualAp.IgG2LowerLimit, igManualAp.IgG2UpperLimit),
-                        IgTypeEnum.IgG3 => GetRangeResult(value, igManualAp.IgG3LowerLimit, igManualAp.IgG3GUpperLimit),
-                        IgTypeEnum.IgG4 => GetRangeResult(value, igManualAp.IgG4LowerLimit, igManualAp.IgG4UpperLimit),
-                        _ => "No Limit Defined"
-                    };
-                    igManualApResults.Add(key, (rangeResult, value));
-                }
-                if (igManualCilvPrimer != null)
+                    IgType = IgTypeEnum.IgG,
+                    MinMaxResult = GetRangeResult(details.IgG, iggOsRange.MinValue, iggOsRange.MaxValue),
+                    ArithMeanResult = GetRangeResult(details.IgG, (iggOsRange.ArithmeticMean - iggOsRange.AMStandardDeviation), (iggOsRange.ArithmeticMean + iggOsRange.AMStandardDeviation))
+                };
+                igRangesOsList.Add(iggOsResult);
+
+                var iggTjpRange = igManualTjp.Where(ig => ig.IgType == IgTypeEnum.IgG).FirstOrDefault();
+                IgTjpRangesResult iggTjpResult = new IgTjpRangesResult
                 {
-                    string rangeResult = key switch
-                    {
-                        IgTypeEnum.IgA => GetRangeResult(value, igManualCilvPrimer.IgALowerLimit, igManualCilvPrimer.IgAUpperLimit),
-                        IgTypeEnum.IgM => GetRangeResult(value, igManualCilvPrimer.IgMLowerLimit, igManualCilvPrimer.IgMUpperLimit),
-                        IgTypeEnum.IgG => GetRangeResult(value, igManualCilvPrimer.IgGLowerLimit, igManualCilvPrimer.IgGUpperLimit),
-                        _ => "No Limit Defined"
-                    };
-                    igManualCilvResults.Add(key, (rangeResult, value));
-                }
-                if (igManualCilvSeconder != null)
+                    IgType = IgTypeEnum.IgG,
+                    MinMaxResult = GetRangeResult(details.IgG, iggTjpRange.MinValue, iggTjpRange.MaxValue),
+                    GMResult = GetRangeResult(details.IgG, (iggTjpRange.GeometricMean - iggTjpRange.GMStandardDeviation), (iggTjpRange.GeometricMean + iggTjpRange.GMStandardDeviation)),
+                    CIResult = GetRangeResult(details.IgG, iggTjpRange.CILowerLimit, iggTjpRange.CIUpperLimit)
+                };
+                igRangesTjpList.Add(iggTjpResult);
+
+                var iggTubRange = igManualTubitak.Where(ig => ig.IgType == IgTypeEnum.IgG).FirstOrDefault();
+                IgTubitakRangesResult iggTubResult = new IgTubitakRangesResult
                 {
-                    string rangeResult = key switch
-                    {
-                        IgTypeEnum.IgG1 => GetRangeResult(value, igManualCilvSeconder.IgG1LowerLimit, igManualCilvSeconder.IgG1UpperLimit),
-                        IgTypeEnum.IgG2 => GetRangeResult(value, igManualCilvSeconder.IgG2LowerLimit, igManualCilvSeconder.IgG2UpperLimit),
-                        IgTypeEnum.IgG3 => GetRangeResult(value, igManualCilvSeconder.IgG3LowerLimit, igManualCilvSeconder.IgG3GUpperLimit),
-                        IgTypeEnum.IgG4 => GetRangeResult(value, igManualCilvSeconder.IgG4LowerLimit, igManualCilvSeconder.IgG4UpperLimit),
-                        _ => "No Limit Defined"
-                    };
-                    igManualCilvResults.Add(key, (rangeResult, value));
-                }
+                    IgType = IgTypeEnum.IgG,
+                    MinMaxResult = GetRangeResult(details.IgG, iggTubRange.MinValue, iggTubRange.MaxValue),
+                    MeanResult = GetRangeResult(details.IgG, (iggTubRange.Mean - iggTubRange.MeanStandardDeviation), (iggTubRange.Mean + iggTubRange.MeanStandardDeviation)),
+                    GMResult = GetRangeResult(details.IgG, (iggTubRange.GeometricMean - iggTubRange.GMStandardDeviation), (iggTubRange.GeometricMean + iggTubRange.GMStandardDeviation)),
+                    CIResult = GetRangeResult(details.IgG, iggTubRange.CILowerLimit, iggTubRange.CIUpperLimit)
+                };
+                igRangesTubitakList.Add(iggTubResult);
+
             }
-            return new List<Dictionary<IgTypeEnum, (string, float)>> { igManualApResults, igManualCilvResults };
+            if (details.IgA != null)
+            {
+                igResultAp.IgAResult = GetRangeResult(details.IgA, igManualAp.IgALowerLimit, igManualAp.IgAUpperLimit);
+                igResultCilv.IgAResult = GetRangeResult(details.IgA, igManualCilvPrimer.IgALowerLimit, igManualCilvPrimer.IgAUpperLimit);
+
+                var igaOsRange = igManualOs.Where(ig => ig.IgType == IgTypeEnum.IgA).FirstOrDefault();
+                IgOsRangesResult igaOsResult = new IgOsRangesResult
+                {
+                    IgType = IgTypeEnum.IgA,
+                    MinMaxResult = GetRangeResult(details.IgA, igaOsRange.MinValue, igaOsRange.MaxValue),
+                    ArithMeanResult = GetRangeResult(details.IgA, (igaOsRange.ArithmeticMean - igaOsRange.AMStandardDeviation), (igaOsRange.ArithmeticMean + igaOsRange.AMStandardDeviation))
+                };
+                igRangesOsList.Add(igaOsResult);
+
+                var igaTjpRange = igManualTjp.Where(ig => ig.IgType == IgTypeEnum.IgA).FirstOrDefault();
+                IgTjpRangesResult igaTjpResult = new IgTjpRangesResult
+                {
+                    IgType = IgTypeEnum.IgA,
+                    MinMaxResult = GetRangeResult(details.IgA, igaTjpRange.MinValue, igaTjpRange.MaxValue),
+                    GMResult = GetRangeResult(details.IgA, (igaTjpRange.GeometricMean - igaTjpRange.GMStandardDeviation), (igaTjpRange.GeometricMean + igaTjpRange.GMStandardDeviation)),
+                    CIResult = GetRangeResult(details.IgA, igaTjpRange.CILowerLimit, igaTjpRange.CIUpperLimit)
+                };
+                igRangesTjpList.Add(igaTjpResult);
+
+                var igaTubRange = igManualTubitak.Where(ig => ig.IgType == IgTypeEnum.IgA).FirstOrDefault();
+                IgTubitakRangesResult igaTubResult = new IgTubitakRangesResult
+                {
+                    IgType = IgTypeEnum.IgA,
+                    MinMaxResult = GetRangeResult(details.IgA, igaTubRange.MinValue, igaTubRange.MaxValue),
+                    MeanResult = GetRangeResult(details.IgA, (igaTubRange.Mean - igaTubRange.MeanStandardDeviation), (igaTubRange.Mean + igaTubRange.MeanStandardDeviation)),
+                    GMResult = GetRangeResult(details.IgA, (igaTubRange.GeometricMean - igaTubRange.GMStandardDeviation), (igaTubRange.GeometricMean + igaTubRange.GMStandardDeviation)),
+                    CIResult = GetRangeResult(details.IgA, igaTubRange.CILowerLimit, igaTubRange.CIUpperLimit)
+                };
+                igRangesTubitakList.Add(igaTubResult);
+
+            }
+            if (details.IgM != null)
+            {
+                igResultAp.IgMResult = GetRangeResult(details.IgM, igManualAp.IgMLowerLimit, igManualAp.IgMUpperLimit);
+                igResultCilv.IgMResult = GetRangeResult(details.IgM, igManualCilvPrimer.IgMLowerLimit, igManualCilvPrimer.IgMUpperLimit);
+
+                var igmOsRange = igManualOs.Where(ig => ig.IgType == IgTypeEnum.IgM).FirstOrDefault();
+                IgOsRangesResult igmOsResult = new IgOsRangesResult
+                {
+                    IgType = IgTypeEnum.IgM,
+                    MinMaxResult = GetRangeResult(details.IgM, igmOsRange.MinValue, igmOsRange.MaxValue),
+                    ArithMeanResult = GetRangeResult(details.IgM, (igmOsRange.ArithmeticMean - igmOsRange.AMStandardDeviation), (igmOsRange.ArithmeticMean + igmOsRange.AMStandardDeviation))
+                };
+                igRangesOsList.Add(igmOsResult);
+
+                var igmTjpRange = igManualTjp.Where(ig => ig.IgType == IgTypeEnum.IgM).FirstOrDefault();
+                IgTjpRangesResult igmTjpResult = new IgTjpRangesResult
+                {
+                    IgType = IgTypeEnum.IgM,
+                    MinMaxResult = GetRangeResult(details.IgM, igmTjpRange.MinValue, igmTjpRange.MaxValue),
+                    GMResult = GetRangeResult(details.IgM, (igmTjpRange.GeometricMean - igmTjpRange.GMStandardDeviation), (igmTjpRange.GeometricMean + igmTjpRange.GMStandardDeviation)),
+                    CIResult = GetRangeResult(details.IgM, igmTjpRange.CILowerLimit, igmTjpRange.CIUpperLimit)
+                };
+                igRangesTjpList.Add(igmTjpResult);
+
+                var igmTubRange = igManualTubitak.Where(ig => ig.IgType == IgTypeEnum.IgM).FirstOrDefault();
+                IgTubitakRangesResult igmTubResult = new IgTubitakRangesResult
+                {
+                    IgType = IgTypeEnum.IgM,
+                    MinMaxResult = GetRangeResult(details.IgM, igmTubRange.MinValue, igmTubRange.MaxValue),
+                    MeanResult = GetRangeResult(details.IgM, (igmTubRange.Mean - igmTubRange.MeanStandardDeviation), (igmTubRange.Mean + igmTubRange.MeanStandardDeviation)),
+                    GMResult = GetRangeResult(details.IgM, (igmTubRange.GeometricMean - igmTubRange.GMStandardDeviation), (igmTubRange.GeometricMean + igmTubRange.GMStandardDeviation)),
+                    CIResult = GetRangeResult(details.IgM, igmTubRange.CILowerLimit, igmTubRange.CIUpperLimit)
+                };
+                igRangesTubitakList.Add(igmTubResult);
+            }
+
+            if (details.IgG1 != null)
+            {
+                igResultAp.IgG1Result = GetRangeResult(details.IgG1, igManualAp.IgG1LowerLimit, igManualAp.IgG1UpperLimit);
+                igResultCilv.IgG1Result = GetRangeResult(details.IgG1, igManualCilvSeconder.IgG1LowerLimit, igManualCilvSeconder.IgG1UpperLimit);
+
+                var igg1TjpRange = igManualTjp.Where(ig => ig.IgType == IgTypeEnum.IgG1).FirstOrDefault();
+                IgTjpRangesResult igg1TjpResult = new IgTjpRangesResult
+                {
+                    IgType = IgTypeEnum.IgG1,
+                    MinMaxResult = GetRangeResult(details.IgG1, igg1TjpRange.MinValue, igg1TjpRange.MaxValue),
+                    GMResult = GetRangeResult(details.IgG1, (igg1TjpRange.GeometricMean - igg1TjpRange.GMStandardDeviation), (igg1TjpRange.GeometricMean + igg1TjpRange.GMStandardDeviation)),
+                    CIResult = GetRangeResult(details.IgG1, igg1TjpRange.CILowerLimit, igg1TjpRange.CIUpperLimit)
+                };
+                igRangesTjpList.Add(igg1TjpResult);
+
+                var igg1TubRange = igManualTubitak.Where(ig => ig.IgType == IgTypeEnum.IgG1).FirstOrDefault();
+                IgTubitakRangesResult igg1TubResult = new IgTubitakRangesResult
+                {
+                    IgType = IgTypeEnum.IgG1,
+                    MinMaxResult = GetRangeResult(details.IgG1, igg1TubRange.MinValue, igg1TubRange.MaxValue),
+                    MeanResult = GetRangeResult(details.IgG1, (igg1TubRange.Mean - igg1TubRange.MeanStandardDeviation), (igg1TubRange.Mean + igg1TubRange.MeanStandardDeviation)),
+                    GMResult = GetRangeResult(details.IgG1, (igg1TubRange.GeometricMean - igg1TubRange.GMStandardDeviation), (igg1TubRange.GeometricMean + igg1TubRange.GMStandardDeviation)),
+                    CIResult = GetRangeResult(details.IgG1, igg1TubRange.CILowerLimit, igg1TubRange.CIUpperLimit)
+                };
+                igRangesTubitakList.Add(igg1TubResult);
+            }
+            if (details.IgG2 != null)
+            {
+                igResultAp.IgG2Result = GetRangeResult(details.IgG2, igManualAp.IgG2LowerLimit, igManualAp.IgG2UpperLimit);
+                igResultCilv.IgG2Result = GetRangeResult(details.IgG2, igManualCilvSeconder.IgG2LowerLimit, igManualCilvSeconder.IgG2UpperLimit);
+
+                var igg2TjpRange = igManualTjp.Where(ig => ig.IgType == IgTypeEnum.IgG2).FirstOrDefault();
+                IgTjpRangesResult igg2TjpResult = new IgTjpRangesResult
+                {
+                    IgType = IgTypeEnum.IgG2,
+                    MinMaxResult = GetRangeResult(details.IgG2, igg2TjpRange.MinValue, igg2TjpRange.MaxValue),
+                    GMResult = GetRangeResult(details.IgG2, (igg2TjpRange.GeometricMean - igg2TjpRange.GMStandardDeviation), (igg2TjpRange.GeometricMean + igg2TjpRange.GMStandardDeviation)),
+                    CIResult = GetRangeResult(details.IgG2, igg2TjpRange.CILowerLimit, igg2TjpRange.CIUpperLimit)
+                };
+                igRangesTjpList.Add(igg2TjpResult);
+
+                var igg2TubRange = igManualTubitak.Where(ig => ig.IgType == IgTypeEnum.IgG2).FirstOrDefault();
+                IgTubitakRangesResult igg2TubResult = new IgTubitakRangesResult
+                {
+                    IgType = IgTypeEnum.IgG2,
+                    MinMaxResult = GetRangeResult(details.IgG2, igg2TubRange.MinValue, igg2TubRange.MaxValue),
+                    MeanResult = GetRangeResult(details.IgG2, (igg2TubRange.Mean - igg2TubRange.MeanStandardDeviation), (igg2TubRange.Mean + igg2TubRange.MeanStandardDeviation)),
+                    GMResult = GetRangeResult(details.IgG2, (igg2TubRange.GeometricMean - igg2TubRange.GMStandardDeviation), (igg2TubRange.GeometricMean + igg2TubRange.GMStandardDeviation)),
+                    CIResult = GetRangeResult(details.IgG2, igg2TubRange.CILowerLimit, igg2TubRange.CIUpperLimit)
+                };
+                igRangesTubitakList.Add(igg2TubResult);
+            }
+            if (details.IgG3 != null)
+            {
+                igResultAp.IgG3Result = GetRangeResult(details.IgG3, igManualAp.IgG3LowerLimit, igManualAp.IgG3UpperLimit);
+                igResultCilv.IgG3Result = GetRangeResult(details.IgG3, igManualCilvSeconder.IgG3LowerLimit, igManualCilvSeconder.IgG3UpperLimit);
+
+                var igg3TjpRange = igManualTjp.Where(ig => ig.IgType == IgTypeEnum.IgG3).FirstOrDefault();
+                IgTjpRangesResult igg3TjpResult = new IgTjpRangesResult
+                {
+                    IgType = IgTypeEnum.IgG3,
+                    MinMaxResult = GetRangeResult(details.IgG3, igg3TjpRange.MinValue, igg3TjpRange.MaxValue),
+                    GMResult = GetRangeResult(details.IgG3, (igg3TjpRange.GeometricMean - igg3TjpRange.GMStandardDeviation), (igg3TjpRange.GeometricMean + igg3TjpRange.GMStandardDeviation)),
+                    CIResult = GetRangeResult(details.IgG3, igg3TjpRange.CILowerLimit, igg3TjpRange.CIUpperLimit)
+                };
+                igRangesTjpList.Add(igg3TjpResult);
+
+                var igg3TubRange = igManualTubitak.Where(ig => ig.IgType == IgTypeEnum.IgG3).FirstOrDefault();
+                IgTubitakRangesResult igg3TubResult = new IgTubitakRangesResult
+                {
+                    IgType = IgTypeEnum.IgG3,
+                    MinMaxResult = GetRangeResult(details.IgG3, igg3TubRange.MinValue, igg3TubRange.MaxValue),
+                    MeanResult = GetRangeResult(details.IgG3, (igg3TubRange.Mean - igg3TubRange.MeanStandardDeviation), (igg3TubRange.Mean + igg3TubRange.MeanStandardDeviation)),
+                    GMResult = GetRangeResult(details.IgG3, (igg3TubRange.GeometricMean - igg3TubRange.GMStandardDeviation), (igg3TubRange.GeometricMean + igg3TubRange.GMStandardDeviation)),
+                    CIResult = GetRangeResult(details.IgG3, igg3TubRange.CILowerLimit, igg3TubRange.CIUpperLimit)
+                };
+                igRangesTubitakList.Add(igg3TubResult);
+            }
+            if (details.IgG4 != null)
+            {
+                igResultAp.IgG4Result = GetRangeResult(details.IgG4, igManualAp.IgG4LowerLimit, igManualAp.IgG4UpperLimit);
+                igResultCilv.IgG4Result = GetRangeResult(details.IgG4, igManualCilvSeconder.IgG4LowerLimit, igManualCilvSeconder.IgG4UpperLimit);
+
+                var igg4TjpRange = igManualTjp.Where(ig => ig.IgType == IgTypeEnum.IgG4).FirstOrDefault();
+                IgTjpRangesResult igg4TjpResult = new IgTjpRangesResult
+                {
+                    IgType = IgTypeEnum.IgG4,
+                    MinMaxResult = GetRangeResult(details.IgG4, igg4TjpRange.MinValue, igg4TjpRange.MaxValue),
+                    GMResult = GetRangeResult(details.IgG4, (igg4TjpRange.GeometricMean - igg4TjpRange.GMStandardDeviation), (igg4TjpRange.GeometricMean + igg4TjpRange.GMStandardDeviation)),
+                    CIResult = GetRangeResult(details.IgG4, igg4TjpRange.CILowerLimit, igg4TjpRange.CIUpperLimit)
+                };
+                igRangesTjpList.Add(igg4TjpResult);
+
+                var igg4TubRange = igManualTubitak.Where(ig => ig.IgType == IgTypeEnum.IgG4).FirstOrDefault();
+                IgTubitakRangesResult igg4TubResult = new IgTubitakRangesResult
+                {
+                    IgType = IgTypeEnum.IgG4,
+                    MinMaxResult = GetRangeResult(details.IgG4, igg4TubRange.MinValue, igg4TubRange.MaxValue),
+                    MeanResult = GetRangeResult(details.IgG4, (igg4TubRange.Mean - igg4TubRange.MeanStandardDeviation), (igg4TubRange.Mean + igg4TubRange.MeanStandardDeviation)),
+                    GMResult = GetRangeResult(details.IgG4, (igg4TubRange.GeometricMean - igg4TubRange.GMStandardDeviation), (igg4TubRange.GeometricMean + igg4TubRange.GMStandardDeviation)),
+                    CIResult = GetRangeResult(details.IgG4, igg4TubRange.CILowerLimit, igg4TubRange.CIUpperLimit)
+                };
+                igRangesTubitakList.Add(igg4TubResult);
+            }
+
+            igResultOs.IgOsRangesResults = igRangesOsList;
+            igResultTjp.IgTjpRangesResults = igRangesTjpList;
+            igResultTubitak.IgTubitakRangesResults = igRangesTubitakList;
+            var allDetails = new TestResultsFromManuals
+            {
+                Details = details,
+                ManualApResults = igResultAp,
+                ManualCilvResults = igResultCilv,
+                ManualOsResults = igResultOs,
+                ManualTjpResults = igResultTjp,
+                ManualTubitakResults = igResultTubitak
+            };
+            return allDetails;
         }
 
 
-        private static string GetRangeResult(float value, float lowerLimit, float upperLimit)
+        private static string GetRangeResult(float? value, float lowerLimit, float upperLimit)
         {
             if (value < lowerLimit) return "Dusuk";
             if (value > upperLimit) return "Yuksek";

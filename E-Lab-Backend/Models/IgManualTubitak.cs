@@ -16,4 +16,21 @@
         public float CIUpperLimit { get; set; }
         public float CILowerLimit { get; set; }
     }
+
+    public class ManualTubitakResult
+    {
+        public string ReferencedManualName { get; set; } = "ManualTubitak";
+
+        public List<IgTubitakRangesResult> IgTubitakRangesResults { get; set; }
+    }
+
+    public class IgTubitakRangesResult
+    {
+        public IgTypeEnum IgType { get; set; }
+        public string GMResult { get; set; }
+        public string MeanResult {  get; set; }
+        public string MinMaxResult { get; set; }
+        public string CIResult { get; set; }
+    }
+
 }

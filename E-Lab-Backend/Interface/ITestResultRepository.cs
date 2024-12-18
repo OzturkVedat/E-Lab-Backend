@@ -6,6 +6,8 @@ namespace E_Lab_Backend.Interface
     {
         Task<ResultModel> GetTestResultDetails(string resultId);
         Task<ResultModel> GetAllTestResultsOfUser(string userId);
+        Task<ResultModel> GetAllTestResults();
+        Task<ResultModel> GetPreviousTestResults(string resultId);
         Task<ResultModel> AddNewTestResult(NewTestResultDto dto);
     }
 }

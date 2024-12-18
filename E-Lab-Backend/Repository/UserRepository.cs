@@ -2,6 +2,7 @@
 using E_Lab_Backend.Dto;
 using E_Lab_Backend.Interface;
 using E_Lab_Backend.Models;
+using E_Lab_Backend.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace E_Lab_Backend.Repository
@@ -9,9 +10,11 @@ namespace E_Lab_Backend.Repository
     public class UserRepository : IUserRepository
     {
         private readonly ApplicationDbContext _context;
-        public UserRepository(ApplicationDbContext context)
+        private readonly IPasswordHasher _passwordHasher;
+        public UserRepository(ApplicationDbContext context, IPasswordHasher passwordHasher)
         {
             _context = context;
+            _passwordHasher = passwordHasher;
         }
         public async Task<ResultModel> GetUserById(string id)
         {
@@ -71,6 +74,20 @@ namespace E_Lab_Backend.Repository
             var result = await _context.SaveChangesAsync();
             return result > 0 ?
                 new SuccessResult("Kullanici başarıyla kaydedildi.") : new FailureResult("Kullanici kaydedilemedi.");
+        }
+
+        public async Task<ResultModel> UpdateUserDetails(string userId, UserUpdateDto dto)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                return new FailureResult("Kullanıcı bulunamadı.");
+
+            user.FullName = dto.FullName;
+            user.Email = dto.Email;
+            user.PasswordHashed = _passwordHasher.HashPassword(dto.Password);
+            var result = await _context.SaveChangesAsync();
+            return result > 0 ?
+                new SuccessResult("Kullanıcı bilgileri başarıyla güncellendi.") : new FailureResult("Kullanıcı bilgileri güncellenemedi.");
         }
 
         public async Task<ResultModel> DeleteUser(string id)

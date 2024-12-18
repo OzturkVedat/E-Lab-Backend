@@ -29,7 +29,7 @@ namespace E_Lab_Backend.Migrations
                     IgG2LowerLimit = table.Column<float>(type: "real", nullable: false),
                     IgG2UpperLimit = table.Column<float>(type: "real", nullable: false),
                     IgG3LowerLimit = table.Column<float>(type: "real", nullable: false),
-                    IgG3GUpperLimit = table.Column<float>(type: "real", nullable: false),
+                    IgG3UpperLimit = table.Column<float>(type: "real", nullable: false),
                     IgG4LowerLimit = table.Column<float>(type: "real", nullable: false),
                     IgG4UpperLimit = table.Column<float>(type: "real", nullable: false)
                 },
@@ -69,7 +69,7 @@ namespace E_Lab_Backend.Migrations
                     IgG2LowerLimit = table.Column<float>(type: "real", nullable: false),
                     IgG2UpperLimit = table.Column<float>(type: "real", nullable: false),
                     IgG3LowerLimit = table.Column<float>(type: "real", nullable: false),
-                    IgG3GUpperLimit = table.Column<float>(type: "real", nullable: false),
+                    IgG3UpperLimit = table.Column<float>(type: "real", nullable: false),
                     IgG4LowerLimit = table.Column<float>(type: "real", nullable: false),
                     IgG4UpperLimit = table.Column<float>(type: "real", nullable: false)
                 },

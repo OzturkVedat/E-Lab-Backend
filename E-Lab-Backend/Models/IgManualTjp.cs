@@ -16,6 +16,22 @@
 
     }
 
+    public class ManualTjpResult
+    {
+        public string ReferencedManualName { get; set; } = "ManualTjp";
+
+        public List<IgTjpRangesResult> IgTjpRangesResults { get; set; }     // ap and cilv manuals
+    }
+
+    public class IgTjpRangesResult
+    {
+        public IgTypeEnum IgType { get; set; }
+        public string GMResult {  get; set; }
+        public string MinMaxResult {  get; set; }
+        public string CIResult {  get; set; }
+        
+    }
+
     public enum IgTypeEnum
     {
         IgA,

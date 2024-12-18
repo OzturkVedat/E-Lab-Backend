@@ -22,6 +22,10 @@ namespace E_Lab_Backend.Controllers
             _testResultRepository = testResultRepository;
         }
 
+        /// <summary>
+        /// Tüm hastaların detaylarını getirir.
+        /// </summary>
+        /// <returns>Hastaların bilgilerini içeren bir liste.</returns>
         [HttpGet("all-patient-details")]
         public async Task<IActionResult> GetAllPatientDetails()
         {
@@ -30,6 +34,11 @@ namespace E_Lab_Backend.Controllers
                 Ok(result) : BadRequest(result);
         }
 
+        /// <summary>
+        /// Belirtilen hasta ID'sine ait tüm tahlil sonuçlarını getirir.
+        /// </summary>
+        /// <param name="patientId">Hasta ID'si.</param>
+        /// <returns>Tahlil sonuçları listesi.</returns>
         [HttpGet("patient-test-results/{patientId}")]
         public async Task<IActionResult> GetPatientTestResultsById(string patientId)
         {
@@ -41,6 +50,11 @@ namespace E_Lab_Backend.Controllers
                 BadRequest(results) : Ok(results);
         }
 
+        /// <summary>
+        /// Belirtilen tahlil sonucu ID'sinin detaylarını ve kılavuzlardaki sonuçlarını getirir.
+        /// </summary>
+        /// <param name="testResultId">Tahlil sonucu ID'si.</param>
+        /// <returns>Tahlil sonucu detayları.</returns>
         [HttpGet("test-result-details/{testResultId}")]
         public async Task<IActionResult> GetTestResultDetailsById(string testResultId)
         {
@@ -51,6 +65,37 @@ namespace E_Lab_Backend.Controllers
             return detailsResult is FailureResult ? BadRequest(detailsResult) : Ok(detailsResult);
         }
 
+        /// <summary>
+        /// Aynı hasta için belirtilen tahlil sonucundan önceki iki tahlil sonucunu (varsa) getirir.
+        /// </summary>
+        /// <param name="testResultId">Tahlil sonucu ID'si.</param>
+        /// <returns>Önceki tahlil sonuçları.</returns>
+        [HttpGet("previous-test-results/{testResultId}")]
+        public async Task<IActionResult> GetPreviousTestResults(string testResultId)
+        {
+            if (testResultId.IsNullOrEmpty())
+                return BadRequest(new FailureResult("testResultId degeri bos olamaz."));
+
+            var prevResults= await _testResultRepository.GetPreviousTestResults(testResultId);
+            return prevResults is FailureResult ? BadRequest(prevResults) : Ok(prevResults);
+        }
+
+        /// <summary>
+        /// Kayıtlı tüm tahlil sonuçlarını getirir.
+        /// </summary>
+        /// <returns>Tüm tahlil sonuçlarının bir listesi.</returns>
+        [HttpGet("all-test-results")]
+        public async Task<IActionResult> GetAllTestResults()
+        {
+
+            var results = await _testResultRepository.GetAllTestResults(); 
+            return results is FailureResult ? BadRequest(results):Ok(results);
+        }
+
+        /// <summary>
+        /// Yeni bir tahlil sonucu kaydı ekler.
+        /// </summary>
+        /// <param name="dto">Yeni tahlil sonucu bilgileri.</param>
         [HttpPost("new-test-result")]
         public async Task<IActionResult> AddNewTestResult([FromBody] NewTestResultDto dto)
         {
@@ -67,7 +112,6 @@ namespace E_Lab_Backend.Controllers
             return result is SuccessResult ?
                 Ok(result) : BadRequest(result);
         }
-
 
     }
 }
