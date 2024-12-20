@@ -21,7 +21,6 @@ namespace E_Lab_Backend.Dto
     {
         public string Id { get; set; }
         public DateTime ExpertApproveTime { get; set; }
-        public GenderEnum Gender { get; set; }
         public SampleTypeEnum SampleType { get; set; }
         public int AgeInMonths {  get; set; }
         public float? IgA { get; set; }
@@ -68,5 +67,17 @@ namespace E_Lab_Backend.Dto
         public float? IgG3 { get; set; }
         public float? IgG4 { get; set; }
     } 
+
+    public class CheckManualDto
+    {
+        public int AgeInMonths { get; set; }
+        public float? IgA { get; set; }
+        public float? IgM { get; set; }
+        public float? IgG { get; set; }
+        public float? IgG1 { get; set; }
+        public float? IgG2 { get; set; }
+        public float? IgG3 { get; set; }
+        public float? IgG4 { get; set; }
+    }
 
 }

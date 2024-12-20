@@ -25,7 +25,7 @@ namespace E_Lab_Backend.Controllers
         /// <summary>
         /// Tüm hastaların detaylarını getirir.
         /// </summary>
-        /// <returns>Hastaların bilgilerini içeren bir liste.</returns>
+        /// <returns>Hastaların bilgilerini içeren liste</returns>
         [HttpGet("all-patient-details")]
         public async Task<IActionResult> GetAllPatientDetails()
         {
@@ -38,7 +38,7 @@ namespace E_Lab_Backend.Controllers
         /// Belirtilen hasta ID'sine ait tüm tahlil sonuçlarını getirir.
         /// </summary>
         /// <param name="patientId">Hasta ID'si.</param>
-        /// <returns>Tahlil sonuçları listesi.</returns>
+        /// <returns>Tahlil sonuçları listesi</returns>
         [HttpGet("patient-test-results/{patientId}")]
         public async Task<IActionResult> GetPatientTestResultsById(string patientId)
         {
@@ -54,7 +54,7 @@ namespace E_Lab_Backend.Controllers
         /// Belirtilen tahlil sonucu ID'sinin detaylarını ve kılavuzlardaki sonuçlarını getirir.
         /// </summary>
         /// <param name="testResultId">Tahlil sonucu ID'si.</param>
-        /// <returns>Tahlil sonucu detayları.</returns>
+        /// <returns>Tahlil sonucu detayları</returns>
         [HttpGet("test-result-details/{testResultId}")]
         public async Task<IActionResult> GetTestResultDetailsById(string testResultId)
         {
@@ -69,7 +69,7 @@ namespace E_Lab_Backend.Controllers
         /// Aynı hasta için belirtilen tahlil sonucundan önceki iki tahlil sonucunu (varsa) getirir.
         /// </summary>
         /// <param name="testResultId">Tahlil sonucu ID'si.</param>
-        /// <returns>Önceki tahlil sonuçları.</returns>
+        /// <returns>Önceki tahlil sonuçları</returns>
         [HttpGet("previous-test-results/{testResultId}")]
         public async Task<IActionResult> GetPreviousTestResults(string testResultId)
         {
@@ -83,7 +83,7 @@ namespace E_Lab_Backend.Controllers
         /// <summary>
         /// Kayıtlı tüm tahlil sonuçlarını getirir.
         /// </summary>
-        /// <returns>Tüm tahlil sonuçlarının bir listesi.</returns>
+        /// <returns>Tüm tahlil sonuçlarının bir listesi</returns>
         [HttpGet("all-test-results")]
         public async Task<IActionResult> GetAllTestResults()
         {
@@ -92,10 +92,25 @@ namespace E_Lab_Backend.Controllers
             return results is FailureResult ? BadRequest(results):Ok(results);
         }
 
+
+        /// <summary>
+        /// Yaş ve Ig degerlerinin kilavuzlarda sonuçlarını getirir.
+        /// </summary>
+        /// <returns>Kılavuz sonuçları</returns>
+        [HttpPost("check-manual")]
+        public async Task<IActionResult> GetManualResultsByAgeAndIgs([FromBody] CheckManualDto dto)
+        {
+            if (dto == null || dto.AgeInMonths < 0)
+                return BadRequest(new FailureResult("Gecersiz sorgu giris verisi."));
+
+            var result = await _testResultRepository.GetManualResultsByAgeAndIgs(dto);
+            return result is FailureResult ? BadRequest(result) : Ok(result);
+        }
+
         /// <summary>
         /// Yeni bir tahlil sonucu kaydı ekler.
         /// </summary>
-        /// <param name="dto">Yeni tahlil sonucu bilgileri.</param>
+        /// <param name="dto">Yeni tahlil sonucu bilgileri</param>
         [HttpPost("new-test-result")]
         public async Task<IActionResult> AddNewTestResult([FromBody] NewTestResultDto dto)
         {

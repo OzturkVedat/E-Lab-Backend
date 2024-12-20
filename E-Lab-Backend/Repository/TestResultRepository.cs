@@ -22,13 +22,28 @@ namespace E_Lab_Backend.Repository
             _logger = logger;
         }
 
+        public async Task<ResultModel> GetManualResultsByAgeAndIgs(CheckManualDto dto)
+        {
+            try
+            {
+                var details = _mapper.Map<TestResultDetails>(dto);
+                var manResults = await CheckManuals(details);
+                return new SuccessDataResult<TestResultsFromManuals>(manResults);
+
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching manual results.");
+                return new FailureResult("Kilavuz sonucu sorgusunda bir hata olustu.");
+            }   
+        }
+
         public async Task<ResultModel> GetTestResultDetails(string resultId)
         {
             try
             {
                 var result = await _context.TestResults
                     .AsNoTracking()
-                    .Include(r => r.Patient)
                     .Where(r => r.Id == resultId)
                     .ProjectTo<TestResultDetails>(_mapper.ConfigurationProvider)
                     .FirstOrDefaultAsync();
@@ -134,7 +149,7 @@ namespace E_Lab_Backend.Repository
         private async Task<TestResultsFromManuals> CheckManuals(TestResultDetails details)
         {
             var ageInMonths = details.AgeInMonths;
-            var gender = details.Gender;
+
             var igManualAp = await _context.IgsManualAp
                 .Where(ig => ageInMonths >= ig.AgeInMonthsLowerLimit && ageInMonths <= ig.AgeInMonthsUpperLimit)
                 .FirstOrDefaultAsync();
@@ -290,15 +305,18 @@ namespace E_Lab_Backend.Repository
                 igRangesTjpList.Add(igg1TjpResult);
 
                 var igg1TubRange = igManualTubitak.Where(ig => ig.IgType == IgTypeEnum.IgG1).FirstOrDefault();
-                IgTubitakRangesResult igg1TubResult = new IgTubitakRangesResult
+                if(igg1TubRange != null)
                 {
-                    IgType = IgTypeEnum.IgG1,
-                    MinMaxResult = GetRangeResult(details.IgG1, igg1TubRange.MinValue, igg1TubRange.MaxValue),
-                    MeanResult = GetRangeResult(details.IgG1, (igg1TubRange.Mean - igg1TubRange.MeanStandardDeviation), (igg1TubRange.Mean + igg1TubRange.MeanStandardDeviation)),
-                    GMResult = GetRangeResult(details.IgG1, (igg1TubRange.GeometricMean - igg1TubRange.GMStandardDeviation), (igg1TubRange.GeometricMean + igg1TubRange.GMStandardDeviation)),
-                    CIResult = GetRangeResult(details.IgG1, igg1TubRange.CILowerLimit, igg1TubRange.CIUpperLimit)
-                };
-                igRangesTubitakList.Add(igg1TubResult);
+                    IgTubitakRangesResult igg1TubResult = new IgTubitakRangesResult
+                    {
+                        IgType = IgTypeEnum.IgG1,
+                        MinMaxResult = GetRangeResult(details.IgG1, igg1TubRange.MinValue, igg1TubRange.MaxValue),
+                        MeanResult = GetRangeResult(details.IgG1, (igg1TubRange.Mean - igg1TubRange.MeanStandardDeviation), (igg1TubRange.Mean + igg1TubRange.MeanStandardDeviation)),
+                        GMResult = GetRangeResult(details.IgG1, (igg1TubRange.GeometricMean - igg1TubRange.GMStandardDeviation), (igg1TubRange.GeometricMean + igg1TubRange.GMStandardDeviation)),
+                        CIResult = GetRangeResult(details.IgG1, igg1TubRange.CILowerLimit, igg1TubRange.CIUpperLimit)
+                    };
+                    igRangesTubitakList.Add(igg1TubResult);
+                }            
             }
             if (details.IgG2 != null)
             {
@@ -316,15 +334,18 @@ namespace E_Lab_Backend.Repository
                 igRangesTjpList.Add(igg2TjpResult);
 
                 var igg2TubRange = igManualTubitak.Where(ig => ig.IgType == IgTypeEnum.IgG2).FirstOrDefault();
-                IgTubitakRangesResult igg2TubResult = new IgTubitakRangesResult
+                if(igg2TubRange != null)
                 {
-                    IgType = IgTypeEnum.IgG2,
-                    MinMaxResult = GetRangeResult(details.IgG2, igg2TubRange.MinValue, igg2TubRange.MaxValue),
-                    MeanResult = GetRangeResult(details.IgG2, (igg2TubRange.Mean - igg2TubRange.MeanStandardDeviation), (igg2TubRange.Mean + igg2TubRange.MeanStandardDeviation)),
-                    GMResult = GetRangeResult(details.IgG2, (igg2TubRange.GeometricMean - igg2TubRange.GMStandardDeviation), (igg2TubRange.GeometricMean + igg2TubRange.GMStandardDeviation)),
-                    CIResult = GetRangeResult(details.IgG2, igg2TubRange.CILowerLimit, igg2TubRange.CIUpperLimit)
-                };
-                igRangesTubitakList.Add(igg2TubResult);
+                    IgTubitakRangesResult igg2TubResult = new IgTubitakRangesResult
+                    {
+                        IgType = IgTypeEnum.IgG2,
+                        MinMaxResult = GetRangeResult(details.IgG2, igg2TubRange.MinValue, igg2TubRange.MaxValue),
+                        MeanResult = GetRangeResult(details.IgG2, (igg2TubRange.Mean - igg2TubRange.MeanStandardDeviation), (igg2TubRange.Mean + igg2TubRange.MeanStandardDeviation)),
+                        GMResult = GetRangeResult(details.IgG2, (igg2TubRange.GeometricMean - igg2TubRange.GMStandardDeviation), (igg2TubRange.GeometricMean + igg2TubRange.GMStandardDeviation)),
+                        CIResult = GetRangeResult(details.IgG2, igg2TubRange.CILowerLimit, igg2TubRange.CIUpperLimit)
+                    };
+                    igRangesTubitakList.Add(igg2TubResult);
+                }             
             }
             if (details.IgG3 != null)
             {
@@ -342,15 +363,18 @@ namespace E_Lab_Backend.Repository
                 igRangesTjpList.Add(igg3TjpResult);
 
                 var igg3TubRange = igManualTubitak.Where(ig => ig.IgType == IgTypeEnum.IgG3).FirstOrDefault();
-                IgTubitakRangesResult igg3TubResult = new IgTubitakRangesResult
+                if(igg3TubRange != null)
                 {
-                    IgType = IgTypeEnum.IgG3,
-                    MinMaxResult = GetRangeResult(details.IgG3, igg3TubRange.MinValue, igg3TubRange.MaxValue),
-                    MeanResult = GetRangeResult(details.IgG3, (igg3TubRange.Mean - igg3TubRange.MeanStandardDeviation), (igg3TubRange.Mean + igg3TubRange.MeanStandardDeviation)),
-                    GMResult = GetRangeResult(details.IgG3, (igg3TubRange.GeometricMean - igg3TubRange.GMStandardDeviation), (igg3TubRange.GeometricMean + igg3TubRange.GMStandardDeviation)),
-                    CIResult = GetRangeResult(details.IgG3, igg3TubRange.CILowerLimit, igg3TubRange.CIUpperLimit)
-                };
-                igRangesTubitakList.Add(igg3TubResult);
+                    IgTubitakRangesResult igg3TubResult = new IgTubitakRangesResult
+                    {
+                        IgType = IgTypeEnum.IgG3,
+                        MinMaxResult = GetRangeResult(details.IgG3, igg3TubRange.MinValue, igg3TubRange.MaxValue),
+                        MeanResult = GetRangeResult(details.IgG3, (igg3TubRange.Mean - igg3TubRange.MeanStandardDeviation), (igg3TubRange.Mean + igg3TubRange.MeanStandardDeviation)),
+                        GMResult = GetRangeResult(details.IgG3, (igg3TubRange.GeometricMean - igg3TubRange.GMStandardDeviation), (igg3TubRange.GeometricMean + igg3TubRange.GMStandardDeviation)),
+                        CIResult = GetRangeResult(details.IgG3, igg3TubRange.CILowerLimit, igg3TubRange.CIUpperLimit)
+                    };
+                    igRangesTubitakList.Add(igg3TubResult);
+                }              
             }
             if (details.IgG4 != null)
             {
@@ -368,15 +392,18 @@ namespace E_Lab_Backend.Repository
                 igRangesTjpList.Add(igg4TjpResult);
 
                 var igg4TubRange = igManualTubitak.Where(ig => ig.IgType == IgTypeEnum.IgG4).FirstOrDefault();
-                IgTubitakRangesResult igg4TubResult = new IgTubitakRangesResult
+                if(igg4TubRange != null)
                 {
-                    IgType = IgTypeEnum.IgG4,
-                    MinMaxResult = GetRangeResult(details.IgG4, igg4TubRange.MinValue, igg4TubRange.MaxValue),
-                    MeanResult = GetRangeResult(details.IgG4, (igg4TubRange.Mean - igg4TubRange.MeanStandardDeviation), (igg4TubRange.Mean + igg4TubRange.MeanStandardDeviation)),
-                    GMResult = GetRangeResult(details.IgG4, (igg4TubRange.GeometricMean - igg4TubRange.GMStandardDeviation), (igg4TubRange.GeometricMean + igg4TubRange.GMStandardDeviation)),
-                    CIResult = GetRangeResult(details.IgG4, igg4TubRange.CILowerLimit, igg4TubRange.CIUpperLimit)
-                };
-                igRangesTubitakList.Add(igg4TubResult);
+                    IgTubitakRangesResult igg4TubResult = new IgTubitakRangesResult
+                    {
+                        IgType = IgTypeEnum.IgG4,
+                        MinMaxResult = GetRangeResult(details.IgG4, igg4TubRange.MinValue, igg4TubRange.MaxValue),
+                        MeanResult = GetRangeResult(details.IgG4, (igg4TubRange.Mean - igg4TubRange.MeanStandardDeviation), (igg4TubRange.Mean + igg4TubRange.MeanStandardDeviation)),
+                        GMResult = GetRangeResult(details.IgG4, (igg4TubRange.GeometricMean - igg4TubRange.GMStandardDeviation), (igg4TubRange.GeometricMean + igg4TubRange.GMStandardDeviation)),
+                        CIResult = GetRangeResult(details.IgG4, igg4TubRange.CILowerLimit, igg4TubRange.CIUpperLimit)
+                    };
+                    igRangesTubitakList.Add(igg4TubResult);
+                }           
             }
 
             igResultOs.IgOsRangesResults = igRangesOsList;
