@@ -28,9 +28,12 @@ namespace E_Lab_Backend.Dto
     public class AuthResponse
     {
         public string UserId { get; set; }
+        public string Role { get; set; }
         public string AccessToken { get; set; }
         public string RefreshToken { get; set; }
     }
+
+
     public class DateNotInFutureAttribute : ValidationAttribute
     {
         public override bool IsValid(object value)

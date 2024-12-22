@@ -79,7 +79,7 @@ namespace E_Lab_Backend.Controllers
         /// <summary>
         /// Kullanıcı oturumu açar.
         /// </summary>
-        /// <param name="dto">Giriş yapmak için gerekli bilgiler.</param>
+        /// <param name="dto">Admin girisi icin e-mail: admin@example.com ve sifre: admin123.</param>
         /// <returns>Erişim tokeni(JWT) ve yenileme tokeni.</returns>
         [HttpPost("login")]
         public async Task<IActionResult> LoginUser([FromBody] LoginDto dto)
@@ -111,6 +111,7 @@ namespace E_Lab_Backend.Controllers
             var response = new AuthResponse
             {
                 UserId = userId,
+                Role = role,
                 AccessToken = accessToken,
                 RefreshToken = refreshToken
             };
