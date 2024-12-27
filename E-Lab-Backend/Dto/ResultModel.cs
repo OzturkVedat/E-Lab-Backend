@@ -2,7 +2,7 @@
 {
     public class ResultModel
     {
-        public bool IsSucess {  get; set; }
+        public bool IsSuccess {  get; set; }
         public string Message {  get; set; }
     }
 
@@ -10,7 +10,7 @@
     {
         public SuccessResult(string message)
         {
-            IsSucess = true;
+            IsSuccess = true;
             Message = message;
         }
     }
@@ -21,7 +21,7 @@
 
         public FailureResult(string message)
         {
-            IsSucess = false;
+            IsSuccess = false;
             Message = message;
         }
 
@@ -35,7 +35,7 @@
         public T Data { get; set; }
         public SuccessDataResult(T data)
         {
-            IsSucess = true;
+            IsSuccess = true;
             Data = data;
             Message = "Istenen veriler basariyla alindi";
         }
