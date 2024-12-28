@@ -30,7 +30,7 @@ namespace E_Lab_Backend.Repository
                 .Select(u => new UserDto    // project
                 {
                     FullName = u.FullName,
-                    Email = u.Email,
+                    Tckn = u.Tckn,
                     BirthDate = u.BirthDate
                 })
                 .FirstOrDefaultAsync();
@@ -47,16 +47,17 @@ namespace E_Lab_Backend.Repository
                 {
                     PatientId = u.Id,
                     FullName = u.FullName,
-                    Email = u.Email
+                    Tckn = u.Tckn,
+                    Gender=u.Gender
                 })
                 .ToListAsync();
             return new SuccessDataResult<List<PatientDetails>>(details);
         }
 
-        public async Task<ResultModel> GetUserByEmail(string email)
+        public async Task<ResultModel> GetUserByTckn(string tckn)
         {
             var user = await _context.Users
-                .Where(u => u.Email == email)
+                .Where(u => u.Tckn == tckn)
                 .FirstOrDefaultAsync();
 
             return (user == null) ?
@@ -83,8 +84,7 @@ namespace E_Lab_Backend.Repository
                 return new FailureResult("Kullanıcı bulunamadı.");
 
             user.FullName = dto.FullName;
-            user.Email = dto.Email;
-            user.PasswordHashed = _passwordHasher.HashPassword(dto.Password);
+            user.BirthDate = dto.BirthDate;
             var result = await _context.SaveChangesAsync();
             return result > 0 ?
                 new SuccessResult("Kullanıcı bilgileri başarıyla güncellendi.") : new FailureResult("Kullanıcı bilgileri güncellenemedi.");

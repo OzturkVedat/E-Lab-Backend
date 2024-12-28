@@ -151,7 +151,7 @@ namespace E_Lab_Backend.Migrations
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Gender = table.Column<int>(type: "int", nullable: false),
                     BirthDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Tckn = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     PasswordHashed = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
@@ -223,9 +223,9 @@ namespace E_Lab_Backend.Migrations
                 column: "PatientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_Email",
+                name: "IX_Users_Tckn",
                 table: "Users",
-                column: "Email",
+                column: "Tckn",
                 unique: true);
         }
 

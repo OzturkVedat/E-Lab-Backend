@@ -8,7 +8,7 @@ namespace E_Lab_Backend.Interface
         Task<ResultModel> GetUserById(string id);
         Task<ResultModel> GetUserDetails(string id);
         Task<ResultModel> GetAllPatientDetails();
-        Task<ResultModel> GetUserByEmail(string email);
+        Task<ResultModel> GetUserByTckn(string tckn);
         Task<bool> UserExists(string userId);
         Task<ResultModel> AddUser(UserModel user);
         Task<ResultModel> UpdateUserDetails(string userId, UserUpdateDto dto);

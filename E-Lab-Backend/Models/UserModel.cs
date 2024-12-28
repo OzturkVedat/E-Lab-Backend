@@ -7,7 +7,7 @@ namespace E_Lab_Backend.Models
         public string FullName { get; set; } 
         public GenderEnum Gender { get; set; }
         public DateOnly BirthDate { get; set; }
-        public string Email {  get; set; }
+        public string Tckn {  get; set; }
         public string PasswordHashed {  get; set; }
         public string Role { get; set; } = "User";
         public RefreshToken? RefreshToken { get; set; }

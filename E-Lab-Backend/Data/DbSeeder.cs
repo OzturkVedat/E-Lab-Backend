@@ -78,7 +78,7 @@ namespace E_Lab_Backend.Data
             var admin = new UserModel
             {
                 FullName = "Seeded Admin",
-                Email = "admin@example.com",
+                Tckn = "123456",
                 PasswordHashed = pwHashed,
                 BirthDate = DateOnly.FromDateTime(DateTime.UtcNow),
                 Role = "Admin",
@@ -91,10 +91,10 @@ namespace E_Lab_Backend.Data
         {
             var patients = new List<RegisterDto>
             {
-                new RegisterDto { FullName = "M.A.", Email = "ma@email.com", Password = "mapassword123", BirthDate = new DateOnly(2022,02,21), Gender=GenderEnum.Male },
-                new RegisterDto { FullName = "M.E.C.", Email = "mec@email.com", Password = "mecpassword123", BirthDate = new DateOnly(2021,03,24), Gender=GenderEnum.Male },
-                new RegisterDto { FullName = "A.K.", Email = "ak@email.com", Password = "akpassword123", BirthDate = new DateOnly(2019,12,20), Gender=GenderEnum.Female },
-                new RegisterDto { FullName = "Y.K.", Email = "yk@email.com", Password = "ykpassword123", BirthDate = new DateOnly(2022,05,10), Gender=GenderEnum.Female }
+                new RegisterDto { FullName = "M.A.", Tckn = "00000000000", Password = "mapassword123", BirthDate = new DateOnly(2022,02,21), Gender=GenderEnum.Male },
+                new RegisterDto { FullName = "M.E.C.", Tckn = "11111111111", Password = "mecpassword123", BirthDate = new DateOnly(2021,03,24), Gender=GenderEnum.Male },
+                new RegisterDto { FullName = "A.K.", Tckn = "22222222222", Password = "akpassword123", BirthDate = new DateOnly(2019,12,20), Gender=GenderEnum.Female },
+                new RegisterDto { FullName = "Y.K.", Tckn = "33333333333", Password = "ykpassword123", BirthDate = new DateOnly(2022,05,10), Gender=GenderEnum.Female }
             };
 
             foreach (var patient in patients)
@@ -109,7 +109,7 @@ namespace E_Lab_Backend.Data
                 }
                 catch (SqlException ex)
                 {
-                    _logger.LogError(ex, $"Error registering patient {patient.Email}");
+                    _logger.LogError(ex, $"Error registering patient with tckn: {patient.Tckn}");
                 }
             }
         }
@@ -118,10 +118,10 @@ namespace E_Lab_Backend.Data
         {
             try
             {
-                var userMa = await _userRepository.GetUserByEmail("ma@email.com") as SuccessDataResult<UserModel>;
-                var userMec = await _userRepository.GetUserByEmail("mec@email.com") as SuccessDataResult<UserModel>;
-                var userAk = await _userRepository.GetUserByEmail("ak@email.com") as SuccessDataResult<UserModel>;
-                var userYk = await _userRepository.GetUserByEmail("yk@email.com") as SuccessDataResult<UserModel>;
+                var userMa = await _userRepository.GetUserByTckn("00000000000") as SuccessDataResult<UserModel>;
+                var userMec = await _userRepository.GetUserByTckn("11111111111") as SuccessDataResult<UserModel>;
+                var userAk = await _userRepository.GetUserByTckn("22222222222") as SuccessDataResult<UserModel>;
+                var userYk = await _userRepository.GetUserByTckn("33333333333") as SuccessDataResult<UserModel>;
 
                 var testRes = new List<TestResult>
                 {

@@ -56,22 +56,20 @@ namespace E_Lab_Backend.Controllers
                     .Select(e => e.ErrorMessage));
                 return BadRequest(new FailureResult(errorMessages));
             }
-            var userResult = await _userRepository.GetUserByEmail(dto.Email);
-            if (userResult.IsSucess)
-            {
+            var userResult = await _userRepository.GetUserByTckn(dto.Tckn);
+            if (userResult.IsSuccess)           
                 return BadRequest(new FailureResult("Kullanici zaten mevcut."));
-            }
+            
             var hashedPassword = _passwordHasher.HashPassword(dto.Password);
-
             var user = new UserModel
             {
-                Email = dto.Email,
+                Tckn = dto.Tckn,
                 FullName = dto.FullName,
                 BirthDate = dto.BirthDate,
                 PasswordHashed = hashedPassword
             };
             var result = await _userRepository.AddUser(user);
-            return result.IsSucess
+            return result.IsSuccess
                 ? Ok(new SuccessResult("Kullanici basariyla kaydedildi."))
                 : BadRequest(result);
         }
@@ -79,7 +77,7 @@ namespace E_Lab_Backend.Controllers
         /// <summary>
         /// Kullanıcı oturumu açar.
         /// </summary>
-        /// <param name="dto">Admin girisi icin e-mail: admin@example.com ve sifre: admin123.</param>
+        /// <param name="dto">Admin girisi icin tckn: 123456 ve sifre: admin123.</param>
         /// <returns>Erişim tokeni(JWT) ve yenileme tokeni.</returns>
         [HttpPost("login")]
         public async Task<IActionResult> LoginUser([FromBody] LoginDto dto)
@@ -90,11 +88,11 @@ namespace E_Lab_Backend.Controllers
                 var errorMessages = string.Join(", ", ModelState.Values
                     .SelectMany(v => v.Errors)
                     .Select(e => e.ErrorMessage));
-                _logger.LogWarning("{Email} icin hatalar var: {Errors}", dto.Email, errorMessages);
+                _logger.LogWarning("{tckn} icin hatalar var: {Errors}", dto.Tckn, errorMessages);
                 return BadRequest(new FailureResult(errorMessages));
             }
 
-            var userCheck = await _userRepository.GetUserByEmail(dto.Email);
+            var userCheck = await _userRepository.GetUserByTckn(dto.Tckn);
             if (userCheck is not SuccessDataResult<UserModel> user)
                 return Unauthorized(new FailureResult("Geçersiz kimlik bilgileri."));
 
@@ -146,7 +144,7 @@ namespace E_Lab_Backend.Controllers
                 return Unauthorized(new FailureResult("Kullanıcı kimlik doğrulaması yapılmadı."));
 
             var revokeResult = await _jwtService.RevokeRefreshToken(userIdClaim.Value);
-            return revokeResult.IsSucess ? Ok(revokeResult) : BadRequest(revokeResult);
+            return revokeResult.IsSuccess ? Ok(revokeResult) : BadRequest(revokeResult);
         }
 
         /// <summary>
@@ -162,7 +160,7 @@ namespace E_Lab_Backend.Controllers
                 var errorMessages = string.Join(", ", ModelState.Values
                     .SelectMany(v => v.Errors)
                     .Select(e => e.ErrorMessage));
-                _logger.LogWarning("{Email} icin hatalar var: {Errors}", dto.Email, errorMessages);
+                _logger.LogWarning("{FullName} icin hatalar var: {Errors}", dto.FullName, errorMessages);
                 return BadRequest(new FailureResult(errorMessages));
             }
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
