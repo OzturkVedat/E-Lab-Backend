@@ -10,7 +10,6 @@ namespace E_Lab_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "User")]
     public class UserController : ControllerBase
     {
         private readonly ITestResultRepository _testResultRepository;
@@ -23,6 +22,7 @@ namespace E_Lab_Backend.Controllers
         /// Giriş yapmış kullanıcının tüm tahlil sonuçlarını getirir.
         /// </summary>
         /// <returns>Tahlil sonuçları başarıyla getirildiyse 200 OK, aksi takdirde hata mesajı ile 400 BadRequest döner.</returns>
+        [Authorize(Roles = "User")]
         [HttpGet("user-test-results")]
         public async Task<IActionResult> GetAuthenticatedUserTestResults()
         {
@@ -38,6 +38,7 @@ namespace E_Lab_Backend.Controllers
         /// Verilen tahlil sonucu ID'sine göre tahlil detaylarını ve kılavuzlardaki sonuçlarını getirir.
         /// </summary>
         /// <param name="testResultId">Tahlil sonucu ID'si.</param>
+        [Authorize(Roles = "Admin,User")]
         [HttpGet("test-result-details/{testResultId}")]
         public async Task<IActionResult> GetTestResultDetailsById(string testResultId)
         {

@@ -51,18 +51,18 @@ namespace E_Lab_Backend.Controllers
         }
 
         /// <summary>
-        /// Belirtilen tahlil sonucu ID'sinin detaylarını ve kılavuzlardaki sonuçlarını getirir.
+        /// Belirtilen hasta ismine ait tüm sonuçlarını getirir.
         /// </summary>
-        /// <param name="testResultId">Tahlil sonucu ID'si.</param>
-        /// <returns>Tahlil sonucu detayları</returns>
-        [HttpGet("test-result-details/{testResultId}")]
-        public async Task<IActionResult> GetTestResultDetailsById(string testResultId)
+        /// <param name="fullName">Hasta ad soyadı.</param>
+        [HttpGet("patient-by-fullname/{fullName}")]
+        public async Task<IActionResult> GetPatientByFullName(string fullName)
         {
-            if (testResultId.IsNullOrEmpty())
-                return BadRequest(new FailureResult("testResultId degeri bos olamaz."));
+            if (fullName.IsNullOrEmpty())
+                return BadRequest(new FailureResult("Ad soyad bos olamaz."));
 
-            var detailsResult= await _testResultRepository.GetTestResultDetails(testResultId);
-            return detailsResult is FailureResult ? BadRequest(detailsResult) : Ok(detailsResult);
+            var results = await _userRepository.GetUserByFullName(fullName);
+            return results is FailureResult ?
+                BadRequest(results) : Ok(results);
         }
 
         /// <summary>

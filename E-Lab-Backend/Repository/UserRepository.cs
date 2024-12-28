@@ -23,6 +23,23 @@ namespace E_Lab_Backend.Repository
             new FailureResult("Kullanici bulunamadı.") : new SuccessDataResult<UserModel>(user);
         }
 
+        public async Task<ResultModel> GetUserByFullName(string fullname)
+        {
+            var results = await _context.Users
+                .Where(u => EF.Functions.Like(u.FullName, $"%{fullname}%"))
+                .Take(20)
+                .ToListAsync();
+
+            var searchResults = results.Select(user => new PatientDetails
+            {
+                PatientId = user.Id,
+                FullName = user.FullName,
+                Tckn = user.Tckn,
+                Gender=user.Gender,
+            }).ToList();
+            return new SuccessDataResult<List<PatientDetails>>(searchResults);
+        }
+
         public async Task<ResultModel> GetUserDetails(string id)
         {
             var details = await _context.Users

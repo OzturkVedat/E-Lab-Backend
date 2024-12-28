@@ -6,6 +6,7 @@ namespace E_Lab_Backend.Interface
     public interface IUserRepository
     {
         Task<ResultModel> GetUserById(string id);
+        Task<ResultModel> GetUserByFullName(string fullname);
         Task<ResultModel> GetUserDetails(string id);
         Task<ResultModel> GetAllPatientDetails();
         Task<ResultModel> GetUserByTckn(string tckn);

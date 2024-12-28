@@ -77,10 +77,10 @@ namespace E_Lab_Backend.Data
 
             var admin = new UserModel
             {
-                FullName = "Seeded Admin",
+                FullName = "Öner Özdemir",
                 Tckn = "123456",
                 PasswordHashed = pwHashed,
-                BirthDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                BirthDate = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(-42)),
                 Role = "Admin",
                 Gender = GenderEnum.Female
             };
@@ -91,10 +91,10 @@ namespace E_Lab_Backend.Data
         {
             var patients = new List<RegisterDto>
             {
-                new RegisterDto { FullName = "M.A.", Tckn = "00000000000", Password = "mapassword123", BirthDate = new DateOnly(2022,02,21), Gender=GenderEnum.Male },
-                new RegisterDto { FullName = "M.E.C.", Tckn = "11111111111", Password = "mecpassword123", BirthDate = new DateOnly(2021,03,24), Gender=GenderEnum.Male },
-                new RegisterDto { FullName = "A.K.", Tckn = "22222222222", Password = "akpassword123", BirthDate = new DateOnly(2019,12,20), Gender=GenderEnum.Female },
-                new RegisterDto { FullName = "Y.K.", Tckn = "33333333333", Password = "ykpassword123", BirthDate = new DateOnly(2022,05,10), Gender=GenderEnum.Female }
+                new RegisterDto { FullName = "M.A.", Tckn = "3790", Password = "mapw123", BirthDate = new DateOnly(2022,02,21), Gender=GenderEnum.Male },
+                new RegisterDto { FullName = "M.E.C.", Tckn = "31*******02", Password = "mecpw123", BirthDate = new DateOnly(2021,03,24), Gender=GenderEnum.Male },
+                new RegisterDto { FullName = "A.K.", Tckn = "53*******04", Password = "akpw123", BirthDate = new DateOnly(2019,12,20), Gender=GenderEnum.Female },
+                new RegisterDto { FullName = "Y.K.", Tckn = "51*******46", Password = "ykpw123", BirthDate = new DateOnly(2022,05,10), Gender=GenderEnum.Female },
             };
 
             foreach (var patient in patients)
@@ -118,10 +118,10 @@ namespace E_Lab_Backend.Data
         {
             try
             {
-                var userMa = await _userRepository.GetUserByTckn("00000000000") as SuccessDataResult<UserModel>;
-                var userMec = await _userRepository.GetUserByTckn("11111111111") as SuccessDataResult<UserModel>;
-                var userAk = await _userRepository.GetUserByTckn("22222222222") as SuccessDataResult<UserModel>;
-                var userYk = await _userRepository.GetUserByTckn("33333333333") as SuccessDataResult<UserModel>;
+                var userMa = await _userRepository.GetUserByTckn("3790") as SuccessDataResult<UserModel>;
+                var userMec = await _userRepository.GetUserByTckn("31*******02") as SuccessDataResult<UserModel>;
+                var userAk = await _userRepository.GetUserByTckn("53*******04") as SuccessDataResult<UserModel>;
+                var userYk = await _userRepository.GetUserByTckn("51*******46") as SuccessDataResult<UserModel>;
 
                 var testRes = new List<TestResult>
                 {
