@@ -30,6 +30,7 @@
             Errors = errors;
         }
     }
+
     public class SuccessDataResult<T> : ResultModel
     {
         public T Data { get; set; }

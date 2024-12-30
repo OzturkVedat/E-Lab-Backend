@@ -22,14 +22,13 @@ namespace E_Lab_Backend.Repository
             _logger = logger;
         }
 
-        public async Task<ResultModel> GetManualResultsByAgeAndIgs(CheckManualDto dto)
+        public async Task<ResultModel> GetManualResultsByBirthDateAndIgs(CheckManualDto dto)
         {
             try
             {
                 var details = _mapper.Map<TestResultDetails>(dto);
                 var manResults = await CheckManuals(details);
                 return new SuccessDataResult<TestResultsFromManuals>(manResults);
-
             }
             catch(Exception ex)
             {
@@ -146,9 +145,27 @@ namespace E_Lab_Backend.Repository
             }
         }
 
+        private int GetAgeInMonths(DateOnly birthDate)
+        {
+            DateTime currentDate = DateTime.UtcNow;
+            DateTime birthDateTime = birthDate.ToDateTime(TimeOnly.MinValue);
+
+            if (birthDateTime > currentDate)
+                throw new ArgumentException("Birth date cannot be in the future.");
+
+            int totalMonths = ((currentDate.Year - birthDateTime.Year) * 12) + currentDate.Month - birthDateTime.Month;
+
+            if (currentDate.Day < birthDateTime.Day)
+                totalMonths--;
+
+            return totalMonths;
+        }
+
+
+
         private async Task<TestResultsFromManuals> CheckManuals(TestResultDetails details)
         {
-            var ageInMonths = details.AgeInMonths;
+            var ageInMonths = GetAgeInMonths(details.BirthDate);
 
             var igManualAp = await _context.IgsManualAp
                 .Where(ig => ageInMonths >= ig.AgeInMonthsLowerLimit && ageInMonths <= ig.AgeInMonthsUpperLimit)

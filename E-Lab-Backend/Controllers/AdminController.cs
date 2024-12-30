@@ -94,16 +94,16 @@ namespace E_Lab_Backend.Controllers
 
 
         /// <summary>
-        /// Yaş ve Ig degerlerinin kilavuzlarda sonuçlarını getirir.
+        /// Doğum tarihi ve Ig degerlerinin kilavuzlarda sonuçlarını getirir.
         /// </summary>
         /// <returns>Kılavuz sonuçları</returns>
         [HttpPost("check-manual")]
-        public async Task<IActionResult> GetManualResultsByAgeAndIgs([FromBody] CheckManualDto dto)
+        public async Task<IActionResult> GetManualResultsByBirthDateAndIgs([FromBody] CheckManualDto dto)
         {
-            if (dto == null || dto.AgeInMonths < 0)
+            if (dto == null || !ModelState.IsValid)
                 return BadRequest(new FailureResult("Gecersiz sorgu giris verisi."));
 
-            var result = await _testResultRepository.GetManualResultsByAgeAndIgs(dto);
+            var result = await _testResultRepository.GetManualResultsByBirthDateAndIgs(dto);
             return result is FailureResult ? BadRequest(result) : Ok(result);
         }
 

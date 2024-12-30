@@ -22,7 +22,7 @@ namespace E_Lab_Backend.Dto
         public string Id { get; set; }
         public DateTime ExpertApproveTime { get; set; }
         public SampleTypeEnum SampleType { get; set; }
-        public int AgeInMonths {  get; set; }
+        public DateOnly BirthDate {  get; set; }
         public float? IgA { get; set; }
         public float? IgM { get; set; }
         public float? IgG { get; set; }
@@ -70,7 +70,7 @@ namespace E_Lab_Backend.Dto
 
     public class CheckManualDto
     {
-        public int AgeInMonths { get; set; }
+        public DateOnly BirthDate { get; set; }
         public float? IgA { get; set; }
         public float? IgM { get; set; }
         public float? IgG { get; set; }

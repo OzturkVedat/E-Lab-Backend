@@ -15,10 +15,8 @@ namespace E_Lab_Backend
             CreateMap<CheckManualDto,TestResultDetails>().ReverseMap();
 
             CreateMap<TestResult, TestResultDetails>()
-                .ForMember(dest => dest.AgeInMonths, opt =>
-                    opt.MapFrom(src =>
-                        (DateTime.UtcNow.Year - src.Patient.BirthDate.Year) * 12 +
-                        (DateTime.UtcNow.Month - src.Patient.BirthDate.Month)));
+            .ForMember(dest => dest.BirthDate,
+                       opt => opt.MapFrom(src => src.Patient.BirthDate));
 
             CreateMap<RegisterDto, UserModel>();
         }

@@ -60,6 +60,7 @@ namespace E_Lab_Backend.Controllers
             if (userResult.IsSuccess)           
                 return BadRequest(new FailureResult("Kullanici zaten mevcut."));
             
+            
             var hashedPassword = _passwordHasher.HashPassword(dto.Password);
             var user = new UserModel
             {

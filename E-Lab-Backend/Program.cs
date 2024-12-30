@@ -1,6 +1,8 @@
 using E_Lab_Backend;
 using E_Lab_Backend.Data;
+using E_Lab_Backend.Dto;
 using E_Lab_Backend.Interface;
+using E_Lab_Backend.Middleware;
 using E_Lab_Backend.Repository;
 using E_Lab_Backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -92,6 +94,23 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+//app.UseMiddleware<GlobalExceptionMiddleware>();
+app.UseExceptionHandler(appBuilder =>
+{
+    appBuilder.Run(async context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        context.Response.ContentType = "application/json";
+
+        var error = new FailureResult("An unexpected error occurred.")
+        {
+            Errors = new List<string> { "Internal Server Error" }
+        };
+
+        await context.Response.WriteAsJsonAsync(error);
+    });
+});
+
 using (var scope = app.Services.CreateScope())
 {
     try{
@@ -114,12 +133,10 @@ if (app.Environment.IsDevelopment())
 }
 
 //app.UseHttpsRedirection();
-
 app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 
 app.MapControllers();
 
